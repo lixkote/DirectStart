@@ -5,10 +5,10 @@
 
 # DirectStart
 
-**This project aims to recreate the unreleased Start Menu update for Windows 8.1**
+## This project aims to recreate the unreleased Start Menu update for Windows 8.1
 
 
-Note: This is not a real reimplementation, just a recreation using C# WPF.
+**Note: This is not a real reimplementation, just a recreation using C# WPF.**
 
 Supported operating systems:
 
