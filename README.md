@@ -12,11 +12,11 @@
 
 Supported operating systems:
 
-- Windows 10 and 11 all builds (Some features might not be available)
-- Windows 8.1 build 9600
-- Windows 7 and Vista (With latest free Extended Kernel) (Start Menu background color broken)
+- Windows 10 and 11 **en-US english** all builds (Some features might not be available)
+- Windows 8.1 **en-US english** build 9600
+- Windows 7 and Vista **en-US english** (With latest free Extended Kernel) (Start Menu background color broken)
 
-**Do not use this software on any mission critical systems! Its purely experimental!**
+**Please do not use this software on any mission critical systems, its purpose is experimental!**
 
 ## Screenshots:
 
