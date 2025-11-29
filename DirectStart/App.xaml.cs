@@ -111,7 +111,7 @@ namespace AFSM
                     SetRegistryDefaultDword(key, "DisableTiles", 0);
                     SetRegistryDefaultDword(key, "RoundedUserProfileShape", 1);
                     SetRegistryDefaultDword(key, "EnableMetroAppsLoad", 0);
-                    SetRegistryDefaultDword(key, "UseLegacyMenuIntercept", 0);
+                    SetRegistryDefaultDword(key, "UseLegacyMenuIntercept", 1);
                     SetRegistryDefaultString(key, "Theme", "Metro");
 
                     this.Resources["RoundedUserProfileShape"] = ((int?)key.GetValue("RoundedUserProfileShape") == 1);
