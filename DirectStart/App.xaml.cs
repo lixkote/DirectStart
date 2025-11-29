@@ -171,21 +171,7 @@ namespace AFSM
         }
         private string GetResourceDictionaryPath(string themeName)
         {
-            // Map registry specified theme names to actual theme files.
-            // Example: Setting "Fluent" theme in registry will load "Skins/Fluent.xaml"
-            switch (themeName.ToLower())
-            {
-                case "Metro":
-                    return "Skins/Metro.xaml";
-                case "LH_Hillel":
-                    return "Skins/LH_Hillel.xaml";
-                case "Fluent":
-                    return "Skins/Fluent.xaml";
-                case "Classic":
-                    return "Skins/Classic.xaml";
-                default:
-                    return "Skins/Metro.xaml"; // Return default for non existing themes
-            }
+            return "Skins/" + themeName + ".xaml";
         }
     }
 }
