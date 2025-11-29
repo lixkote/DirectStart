@@ -5,10 +5,10 @@
         <ResourceDictionary Source="pack://application:,,,/PresentationFramework.Aero;component/themes/Aero.NormalColor.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- Name: Aero B8taMenu skin. -->
-    <!-- Author: Lixkote -->
-    <!-- Year: 2024 -->
-    <!-- Description:  -->
+    <!-- Name: Longhorn Hillel DirectStart skin. -->
+    <!-- Author: Lixkote/Splitwirez -->
+    <!-- Year: 2025 -->
+    <!-- Description: Windows Longhorn hillel inspired DirectStart theme -->
 
     <DropShadowEffect x:Key="AeroCircleButtonGlyphShadowEffect" Color="Black" BlurRadius="2" Direction="0" ShadowDepth="0" Opacity="1"/>
 
@@ -267,11 +267,10 @@
     <Style x:Key="StartMenuBackgroundStyle" TargetType="{x:Type Grid}">
         <Setter Property="Background">
             <Setter.Value>
-                <ImageBrush ImageSource="pack://siteoforigin:,,,/Resources/lhbg.png"/>
+                <ImageBrush ImageSource="pack://siteoforigin:,,,/Resources/lhbg1.png"/>
             </Setter.Value>
         </Setter>
     </Style>
-
 
     <Style TargetType="ToolTip">
         <Setter Property="Background" Value="#1E1E1E"/>

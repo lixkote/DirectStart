@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Title="Start menu" Width="533" SizeToContent="Manual" Height="519.9" Left="0" x:Name="Menu" DataContext="{Binding ElementName=Menu}"
 		AllowsTransparency="True" WindowStyle="None" Visibility="Visible" 
-		ShowInTaskbar="False" Activated="Window_Activated" Deactivated="Menu_Deactivated" FontFamily="Segoe UI" Topmost="True" BorderThickness="1" Loaded="Menu_Loaded" Background="{x:Null}" Margin="0">
+		ShowInTaskbar="False" Activated="Window_Activated" SourceInitialized="Menu_SourceInitialized" Deactivated="Menu_Deactivated" FontFamily="Segoe UI" Topmost="True" BorderThickness="1" Loaded="Menu_Loaded" Background="{x:Null}" Margin="0">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -381,16 +381,16 @@ Visibility="{Binding Text.IsEmpty, Converter={StaticResource BoolToVis}, Element
             </Grid>
         </Grid>
         <Button Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoTop" Margin="-1,-1,0,-1" Width="49" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
-            <Image IsHitTestVisible="False" Source="/Resources/startopenlogo.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
+            <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
         <Button Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoLeft" Margin="-1,-1,0,0" Width="52" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
-            <Image IsHitTestVisible="False" Source="/Resources/startopenlogo.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
+            <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
         <Button Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoRight" Margin="-1,-1,0,0" Width="53" HorizontalAlignment="Right" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40">
-            <Image IsHitTestVisible="False" Source="/Resources/startopenlogo.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
+            <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
         <Button  Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoBottom" Margin="-1,518,0,-1" Width="50" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" Height="41" VerticalAlignment="Bottom">
-            <Image IsHitTestVisible="False" Source="/Resources/startopenlogo.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True" Margin="0,0,0,0"/>
+            <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True" Margin="0,0,0,0"/>
         </Button>
     </Grid>
 </Window>

@@ -41,7 +41,7 @@ namespace B8TAM
 	/// <summary>
 	/// Manages support for Windows 10's internal blur effect.
 	/// </summary>
-	internal static class BlurEffect
+	internal static class DWMBlurEffect
 	{
 		[DllImport("user32.dll")]
 		internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);

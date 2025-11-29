@@ -1,6 +1,7 @@
 ﻿using AFSM;
 using B8TAM.FrequentHelpers;
 using BlurryControls.Controls;
+using ControlzEx.Standard;
 using IWshRuntimeLibrary;
 using Microsoft.Win32;
 using System;
@@ -43,7 +44,7 @@ namespace B8TAM
 	/// </summary>
 	public partial class StartMenu : Window
 	{
-		StartMenuListener _listener;
+		LegacyStartMenuIntercepter _listener;
 		FrequentAppsHelper frequentHelper;
 		ObservableCollection<StartMenuEntry> Programs = new ObservableCollection<StartMenuEntry>();
 		ObservableCollection<StartMenuEntry> Pinned = new ObservableCollection<StartMenuEntry>();
@@ -53,11 +54,24 @@ namespace B8TAM
 		public SourceType SelectedSourceType { get; set; }
 		private List<SourceType> sourceTypes;
 		private ObservableCollection<CountEntry> countEntries;
-		string forceFillStartButton;
-        string isretrobarfix;
-        string profilePictureShape;
-		double taskbarheightinpx;
-        string noTiles;
+
+		bool Force10BetaStartButton;
+        bool RetroBarFix;
+        public static IntPtr MessageWindowHandle;
+
+        bool RoundedUserProfileShape;
+        bool DisableTiles;
+        bool EnableMetroAppsLoad;
+        bool UseLegacyMenuIntercept;
+
+        public const int WH_START_TRIGGERED = 0x8001; 
+
+
+
+        double taskbarheightinpx;
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool SetWindowText(IntPtr hWnd, string lpString);
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool ExitWindowsEx(uint uFlags, uint dwReason);
@@ -79,45 +93,6 @@ namespace B8TAM
 
 
         public ICommand Run => new RunCommand(RunCommand);
-
-        private void StartPipeServer()
-        {
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    using (var server = new NamedPipeServerStream("DirectStartPipe", PipeDirection.In, NamedPipeServerStream.MaxAllowedServerInstances))
-                    {
-                        try
-                        {
-                            server.WaitForConnection();
-                            using (var reader = new StreamReader(server))
-                            {
-                                var message = reader.ReadLine();
-                                if (message != null && message.Contains("TRIGGER"))
-                                {
-                                    Dispatcher.Invoke(() => OnStartTriggeredNoArgs());
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Received unknown message: " + message);
-                                }
-                            }
-                        }
-                        catch (IOException ex)
-                        {
-                            // Log or handle the error as needed
-                            Console.WriteLine("Named pipe error: " + ex.Message);
-                        }
-                        catch (Exception ex)
-                        {
-                            // Catch other potential exceptions
-                            Console.WriteLine("Error: " + ex.Message);
-                        }
-                    }
-                }
-            });
-        }
 
 
         private static Color GetColor(IntPtr pElementName)
@@ -142,13 +117,19 @@ namespace B8TAM
 			GetPrograms(programs);
             programs = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs");
 			GetPrograms(programs);
-            StartPipeServer();
 
-            string metroAppsDirectory = @"C:\Program Files\WindowsApps"; // Modify this as needed
-            LoadMetroApps(metroAppsDirectory);
 
-            string immersiveSet = @"C:\Windows\ImmersiveControlPanel"; // Modify this as needed
-            LoadMetroApps(immersiveSet);
+            if (EnableMetroAppsLoad == true)
+            {
+                // Searches and loads metro apps from these folders:
+                string metroAppsDirectory = @"C:\Program Files\WindowsApps";
+                LoadMetroApps(metroAppsDirectory);
+                string immersiveSet = @"C:\Windows\ImmersiveControlPanel";
+                LoadMetroApps(immersiveSet);
+
+                // Warning: Metro apps load function is unfinished and can cause crashes!
+                // Blame M$ for not giving any useful way to load them in c#
+            }
 
 
             this.sourceTypes = new List<SourceType>()
@@ -177,30 +158,39 @@ namespace B8TAM
 
             // CollectionView startListView = (CollectionView)CollectionViewSource.GetDefaultView(ProgramsList.ItemsSource);
             PropertyGroupDescription startGroupDesc = new PropertyGroupDescription("Alph");
-			// startListView.GroupDescriptions.Add(startGroupDesc);
-			_listener = new StartMenuListener();
-			_listener.StartTriggered += OnStartTriggered;
-			SearchGlyph.Source = Properties.Resources.SearchBoxGlyph.ToBitmapImage();
+            // startListView.GroupDescriptions.Add(startGroupDesc);
+
+                SearchGlyph.Source = Properties.Resources.searchglyph.ToBitmapImage();
 			// PowerGlyph.Source = Properties.Resources.powerglyph.ToBitmapImage();
 			UserNameText.Text = Environment.UserName;
 
 			DUIColorize();
             LoadTiles();
 			AdjustToTaskbar();
-            profilePictureShape = (string)System.Windows.Application.Current.Resources["ProfilePictureShape"];
-            forceFillStartButton = (string)System.Windows.Application.Current.Resources["ForceFillStartButton"];
-            noTiles = (string)System.Windows.Application.Current.Resources["NoTilesBool"];
-            if (profilePictureShape == "rounded")
-			{
-				UserRounderer.CornerRadius = new CornerRadius(999);
+            bool RoundedUserProfileShape = (bool)System.Windows.Application.Current.Resources["RoundedUserProfileShape"];
+            bool Force10BetaStartButton = (bool)System.Windows.Application.Current.Resources["Force10BetaStartButton"];
+            bool UseLegacyMenuIntercept = (bool)System.Windows.Application.Current.Resources["UseLegacyMenuIntercept"];
+            bool DisableTiles = (bool)System.Windows.Application.Current.Resources["DisableTiles"];
+
+            if (UseLegacyMenuIntercept == true)
+            {
+                // Load old intercepter if manually enabled
+                _listener = new LegacyStartMenuIntercepter();
+                _listener.StartTriggered += OnStartTriggered;
             }
-			else
-			{
+            if (RoundedUserProfileShape)
+            {
+                // Make user avatar rounded
+                UserRounderer.CornerRadius = new CornerRadius(999);
+            }
+            else
+            {
+                // or not 
                 UserRounderer.CornerRadius = new CornerRadius(0);
             }
             if (TilesHost.Items.Count == 0)
             {
-                Debug.WriteLine("(StartMenu.xaml.cs) No pinned tiles were detected or tiles were disabled in registry. Hiding tiles section.");
+                Debug.WriteLine("[StartMenu.xaml.cs] No pinned tiles were detected or tiles were disabled in registry. Hiding tiles section.");
                 Menu.Width = 273;
                 StartMenuBackground.Width = 273;
             }
@@ -385,7 +375,7 @@ namespace B8TAM
 						// Windows 8.1
                         StartLogoTop.Visibility = Visibility.Visible;
                     }
-                    else if (forceFillStartButton == "true")
+                    else if (Force10BetaStartButton == true)
                     {
 						// Windows 8
                         StartLogoTop.Visibility = Visibility.Visible;
@@ -396,7 +386,7 @@ namespace B8TAM
                     }
                     StartLogoTop.Height = taskbarheightinpx + 1;
 					Menu.Margin = new Thickness(0, taskbarheightinpx, 0, 0);
-                    if (forceFillStartButton == "true")
+                    if (Force10BetaStartButton == true)
                     {
                         // Windows 8
                         StartLogoTop.Visibility = Visibility.Visible;
@@ -414,7 +404,7 @@ namespace B8TAM
                         // Windows 8.1
                         StartLogoBottom.Visibility = Visibility.Visible;
                     }
-                    else if (forceFillStartButton == "true")
+                    else if (Force10BetaStartButton == true)
                     {
                         // Windows 8
                         StartLogoBottom.Visibility = Visibility.Visible;
@@ -427,7 +417,7 @@ namespace B8TAM
 					{
                         StartLogoBottom.Height = taskbarheightinpx + 1;
                         Menu.Margin = new Thickness(0, 0, 0, taskbarheightinpx);
-                        if (forceFillStartButton == "true")
+                        if (Force10BetaStartButton == true)
                         {
                             // Windows 8
                             StartLogoBottom.Visibility = Visibility.Visible;
@@ -437,7 +427,7 @@ namespace B8TAM
 					{
                         StartLogoBottom.Height = 48 + 1;
                         Menu.Margin = new Thickness(0, 0, 0, 48);
-                        if (forceFillStartButton == "true")
+                        if (Force10BetaStartButton == true)
                         {
                             // Windows 8
                             StartLogoBottom.Visibility = Visibility.Visible;
@@ -458,7 +448,7 @@ namespace B8TAM
                         // Windows 8.1
                         StartLogoLeft.Visibility = Visibility.Visible;
                     }
-                    else if (forceFillStartButton == "true")
+                    else if (Force10BetaStartButton == true)
                     {
                         // Windows 8
                         StartLogoLeft.Visibility = Visibility.Visible;
@@ -480,7 +470,7 @@ namespace B8TAM
                         // Windows 8.1
                         StartLogoRight.Visibility = Visibility.Visible;
                     }
-                    else if (forceFillStartButton == "true")
+                    else if (Force10BetaStartButton == true)
                     {
                         // Windows 8
                         StartLogoRight.Visibility = Visibility.Visible;
@@ -502,7 +492,7 @@ namespace B8TAM
                         // Windows 8.1
                         StartLogoBottom.Visibility = Visibility.Visible;
                     }
-                    else if (forceFillStartButton == "true")
+                    else if (Force10BetaStartButton == true)
                     {
                         // Windows 8
                         StartLogoBottom.Visibility = Visibility.Visible;
@@ -662,12 +652,12 @@ namespace B8TAM
 			TilesHost.ItemsSource = Tiles;
 		}
 
-        void OnStartTriggered(object sender, EventArgs e)
+        public void OnStartTriggered(object sender, EventArgs e)
         {
             ToggleStartMenu();
         }
 
-        void OnStartTriggeredNoArgs()
+        public void OnStartTriggeredNoArgs()
         {
             ToggleStartMenu();
         }
@@ -707,7 +697,7 @@ namespace B8TAM
 			else if (IsDwmBlurEnabled.Text == "True" || IsDwmBlurEnabled.Text == "true")
 			{
 				// Enable blur
-				BlurEffect.EnableBlur(this);
+				DWMBlurEffect.EnableBlur(this);
             }
 		}
 
@@ -1051,7 +1041,9 @@ namespace B8TAM
 
         private void Menu_Loaded(object sender, RoutedEventArgs e)
         {
-			GridPrograms.Visibility = Visibility.Collapsed;
+            var hwnd = new WindowInteropHelper(this).Handle;
+            SetWindowText(hwnd, "DirectStartWindow"); 
+            GridPrograms.Visibility = Visibility.Collapsed;
 		}
 
         private void StartLogo_Click(object sender, RoutedEventArgs e)
@@ -1371,6 +1363,26 @@ namespace B8TAM
                 Debug.WriteLine("(StartMenu.xaml.cs) A tile was pinned. Unhiding tiles section.");
                 Menu.Width = 533;
                 StartMenuBackground.Width = 533;
+            }
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == WH_START_TRIGGERED)
+            {
+                OnStartTriggeredNoArgs();
+                handled = true;
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private void Menu_SourceInitialized(object sender, EventArgs e)
+        {
+            if (UseLegacyMenuIntercept == false)
+            {
+                HwndSource source = (HwndSource)HwndSource.FromVisual(this);
+                source.AddHook(WndProc);
             }
         }
     }

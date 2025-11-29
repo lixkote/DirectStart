@@ -2,14 +2,14 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:B8TAM">
 
-    <!-- Name: Fluent B8taMenu skin. -->
+    <!-- Name: Fluent DirectStart skin. -->
     <!-- Author: Lixkote -->
-    <!-- Year: 2024 -->
-    <!-- Description: This is a B8taMenu Skin inspired by Windows 10 RTM's start menu -->
+    <!-- Year: 2025 -->
+    <!-- Description: This is a DirectStart Skin inspired by Windows 10 RTM's start menu -->
 
     <Style x:Key="IsSkinSupportDwmBlur" TargetType="{x:Type TextBlock}">
         <!-- False for not support background blur, true for support background blur. -->
-        <!-- Blur only supported on Windows 10 -->
+        <!-- DWM Blur only supported on Windows 10! -->
         <Setter Property="Text" Value="False"></Setter>
     </Style>
 

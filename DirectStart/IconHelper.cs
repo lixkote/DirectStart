@@ -45,7 +45,7 @@ namespace B8TAM
 		{
 			// Icon folder = Properties.Resources.folder;
 			// return folder.ToBitmap().ToBitmapImage();
-			return Properties.Resources.FolderTiny.ToBitmapImage();
+			return Properties.Resources.folder16.ToBitmapImage();
 		}
 		static Dictionary<string, ImageSource> _iconCache = new Dictionary<string, ImageSource>();
 		static string[] _exlcudedIcons = new string[] { ".exe", ".lnk", ".url", ".appref-ms" };

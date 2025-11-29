@@ -8,9 +8,10 @@ using System.Windows.Input;
 
 namespace B8TAM
 {
-	internal class StartMenuListener
+	internal class LegacyStartMenuIntercepter
 	{
-		public StartMenuListener()
+		// Note: this start menu intercepter implementation is litterally awful, please use new WindHawk method by default, its a lot more durable.
+		public LegacyStartMenuIntercepter()
 		{
 			this.MouseCallback += new HookProc(MouseEvents);
 			this.KeyCallback += new HookProc(KeyEvents);

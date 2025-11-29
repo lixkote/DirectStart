@@ -7,14 +7,14 @@
         <ResourceDictionary Source="/PresentationFramework.Classic;component/themes/Classic.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- Name: Classic-style B8taMenu skin. -->
+    <!-- Name: Classic-style DirectStart skin. -->
     <!-- Author: Lixkote -->
-    <!-- Year: 2024 -->
-    <!-- Description: This is the Classic Windows-like b8tamenu style -->
+    <!-- Year: 2025 -->
+    <!-- Description: This is the Classic Windows 9x-like style (unfinished)-->
 
     <Style x:Key="IsSkinSupportDwmBlur" TargetType="{x:Type TextBlock}">
         <!-- False for not support background blur, true for support background blur. -->
-        <!-- Blur only supported on Windows 10 -->
+        <!-- DWM Blur only supported on Windows 10! -->
         <Setter Property="Text" Value="False"></Setter>
     </Style>
 

@@ -1,15 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:B8TAM">
-    
-    <!-- Name: Default B8taMenu skin. -->
+
+    <!-- Name: Default DirectStart skin (Metro) -->
     <!-- Author: Lixkote -->
-    <!-- Year: 2024 -->
-    <!-- Description: This is the default Windows RT Update 3 or Windows 10 Technical Preview-like b8tamenu style -->
+    <!-- Year: 2025 -->
+    <!-- Description: This is the default Windows RT Update 3 or Windows 10 Technical Preview-like DirectStart style -->
 
     <Style x:Key="IsSkinSupportDwmBlur" TargetType="{x:Type TextBlock}">
         <!-- False for not support background blur, true for support background blur. -->
-        <!-- Blur only supported on Windows 10 -->
+        <!-- DWM Blur only supported on Windows 10! -->
         <Setter Property="Text" Value="False"></Setter>
     </Style>
 
@@ -25,7 +25,7 @@
     </Style>
 
     <Style x:Key="PowerGlyphStyle" TargetType="{x:Type Image}">
-        <Setter Property="Source" Value="pack://siteoforigin:,,,/Resources/powerglyph.png"></Setter>
+        <Setter Property="Source" Value="pack://siteoforigin:,,,/Resources/powerbuttonglyph.png"></Setter>
         <Setter Property="Width" Value="14"></Setter>
     </Style>
 
@@ -44,7 +44,7 @@
     </Style>
 
     <Style x:Key="SearchGlyphStyle" TargetType="{x:Type Image}">
-        <Setter Property="Source" Value="pack://siteoforigin:,,,/Resources/SearchBoxGlyph.png"></Setter>
+        <Setter Property="Source" Value="pack://siteoforigin:,,,/Resources/searchglyph.png"></Setter>
     </Style>
 
     <Style x:Key="PowerGlyphStyleText" TargetType="{x:Type TextBlock}">
