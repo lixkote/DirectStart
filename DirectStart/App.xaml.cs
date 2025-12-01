@@ -57,18 +57,21 @@ namespace AFSM
 
                     // Apply theme
                     string resourceDictionaryPath = GetResourceDictionaryPath(theme);
+
                     if (!string.IsNullOrEmpty(resourceDictionaryPath))
                     {
                         ResourceDictionary skinDictionary = new ResourceDictionary
                         {
-                            Source = new Uri(resourceDictionaryPath, UriKind.RelativeOrAbsolute)
+                            Source = new Uri(resourceDictionaryPath, UriKind.Absolute)
                         };
+
                         Resources.MergedDictionaries.Add(skinDictionary);
                     }
                     else
                     {
                         System.Windows.MessageBox.Show(
-                            "The " + theme + " theme specified in registry doesn't exist.\nCheck HKEY_CURRENT_USER\\Software\\DirectStart",
+                            "The " + theme + " theme does not exist in the 'styles' folder next to the executable.\n" +
+                            "Check if '" + theme + ".xaml' is present.",
                             "DirectStart",
                             MessageBoxButton.OK,
                             MessageBoxImage.Error);
@@ -171,7 +174,11 @@ namespace AFSM
         }
         private string GetResourceDictionaryPath(string themeName)
         {
-            return "Skins/" + themeName + ".xaml";
+            string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+            string stylesDir = Path.Combine(exeDir, "Skins");
+            string fullPath = Path.Combine(stylesDir, themeName + ".xaml");
+
+            return File.Exists(fullPath) ? fullPath : null;
         }
     }
 }
