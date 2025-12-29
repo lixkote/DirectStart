@@ -24,8 +24,6 @@ namespace B8TAM
 
         public static string ExtractPath(string decodedString)
         {
-            // Assuming the decoded string contains the path to .lnk or .exe file
-            // You may need to implement a more sophisticated parsing logic based on your specific data format
             return decodedString;
         }
     }

@@ -70,7 +70,7 @@ namespace AFSM
                     else
                     {
                         System.Windows.MessageBox.Show(
-                            "The " + theme + " theme does not exist in the 'styles' folder next to the executable.\n" +
+                            "The " + theme + " theme does not exist in the 'Skins' folder next to the executable.\n" +
                             "Check if '" + theme + ".xaml' is present.",
                             "DirectStart",
                             MessageBoxButton.OK,
@@ -96,7 +96,7 @@ namespace AFSM
             }
 
             SetLanguageDictionary();
-            key.Close();
+            // key.Close();
             StartMenu mainWindow = new StartMenu();
             mainWindow.Show();
         }

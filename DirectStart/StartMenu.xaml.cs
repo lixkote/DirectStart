@@ -146,7 +146,19 @@ namespace B8TAM
 			GetPinned(pinned);
 
 			Programs = new ObservableCollection<StartMenuEntry>(Programs.OrderBy(x => x.Title));
-			Pinned = new ObservableCollection<StartMenuEntry>(Pinned.OrderBy(x => x.Title));
+
+            var DefaultPinnedOrder = new Dictionary<string, int>
+            {
+                { "Documents", 1 },
+                { "Pictures", 2 },
+                { "Control Panel", 3 },
+                { "This PC", 4 }
+            };
+
+            Pinned = new ObservableCollection<StartMenuEntry>(
+                Pinned
+                    .OrderBy(x => DefaultPinnedOrder.ContainsKey(x.Title) ? DefaultPinnedOrder[x.Title] : int.MaxValue)
+            );
 
 			InitializeComponent();
 
@@ -512,84 +524,140 @@ namespace B8TAM
 		int maxfrequent = 5;
 		int startfrequent = 0;
 
-        private string GetDisplayNameFromExePath(string exePath)
+        private static string SmartCapitalizeFirstLetter(string text)
         {
-            string displayName = string.Empty;
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
 
-			try
-			{
-				var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(exePath);
-				displayName = fileVersionInfo.FileDescription;
+            if (char.IsUpper(text[0]))
+                return text;
 
-				// If display name is longer than 17 characters, get the path without extension
-				if (displayName != null)
-				{
-                    if (displayName.Length > 25)
-                    {
-                        displayName = Path.GetFileNameWithoutExtension(exePath);
-                    }
+            return char.ToUpper(text[0]) + text.Substring(1);
+        }
+
+
+        private static readonly string[] WindowsNameExceptions =
+        {
+            "Windows Media Center",
+            "Windows Movie Maker",
+            "Windows Media Player"
+        };
+
+        private string GetFrequentEntryName(string exePath)
+        {
+            if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+                return string.Empty;
+
+            try
+            {
+                var info = FileVersionInfo.GetVersionInfo(exePath);
+
+                string name = null;
+
+                if (!string.IsNullOrWhiteSpace(info.FileDescription))
+                    name = info.FileDescription.Trim();
+
+                else if (!string.IsNullOrWhiteSpace(info.ProductName))
+                    name = info.ProductName.Trim();
+
+                else if (!string.IsNullOrWhiteSpace(info.InternalName))
+                    name = info.InternalName.Trim();
+
+                else if (!string.IsNullOrWhiteSpace(info.OriginalFilename))
+                    name = Path.GetFileNameWithoutExtension(info.OriginalFilename);
+
+                else
+                    name = Path.GetFileNameWithoutExtension(exePath);
+
+                bool isException = WindowsNameExceptions.Any(e =>
+                    string.Equals(e, name, StringComparison.OrdinalIgnoreCase));
+
+                if (!isException &&
+                    name.IndexOf("Windows", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    name = name.Replace("Windows", "").Replace("windows", "").Trim();
                 }
+
+                return SmartCapitalizeFirstLetter(name);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"An error occurred: {ex.Message}", "Error");
+                Debug.WriteLine($"GetFrequentEntryName error: {ex.Message}");
             }
 
-            return displayName;
+            // Okay no other options, so we'll just use the exe filename...
+            return SmartCapitalizeFirstLetter(Path.GetFileName(exePath));
         }
 
         private void GetFrequentsNew()
-		{
-			if (startfrequent <= maxfrequent)
-			{
-				try
-				{
-					RegistryKey reg = Registry.CurrentUser.OpenSubKey(SelectedSourceType.Key);
-					List<CountEntry> sortedEntries = new List<CountEntry>();
+        {
+        if (startfrequent > maxfrequent)
+            return;
 
-					foreach (string valueName in reg.GetValueNames())
-					{
-						CountEntry entry = new CountEntry();
-						entry.Name = valueName;
-						entry.Value = (byte[])reg.GetValue(valueName);
-						entry.RegKey = reg.ToString();
+        try
+        {
+            RegistryKey reg = Registry.CurrentUser.OpenSubKey(SelectedSourceType.Key);
+            List<CountEntry> sortedEntries = new List<CountEntry>();
 
-						if (File.Exists(entry.DecodedName) || Directory.Exists(entry.DecodedName))
-						{
-							sortedEntries.Add(entry);
-						}
-					}
+            foreach (string valueName in reg.GetValueNames())
+            {
+                CountEntry entry = new CountEntry
+                {
+                    Name = valueName,
+                    Value = (byte[])reg.GetValue(valueName),
+                    RegKey = reg.ToString()
+                };
 
-					// Sort the entries based on executionCount in descending order
-					sortedEntries.Sort((a, b) => b.ExecutionCount.CompareTo(a.ExecutionCount));
+                if (File.Exists(entry.DecodedName) || Directory.Exists(entry.DecodedName))
+                {
+                    sortedEntries.Add(entry);
+                }
+            }
 
-					// Add sorted entries to Recent
-					foreach (CountEntry entry in sortedEntries)
-					{
-                        if(!entry.DecodedName.Contains("Start menu"))
-						{
-							Recent.Add(new StartMenuLink
-							{
-								Title = GetDisplayNameFromExePath(entry.DecodedName),
-								Icon = IconHelper.GetFileIcon(entry.DecodedName),
-								Link = entry.DecodedName
-							});
-						}
+            // Sortowanie wg liczby uruchomień
+            sortedEntries.Sort((a, b) => b.ExecutionCount.CompareTo(a.ExecutionCount));
 
-						startfrequent++;
+            foreach (CountEntry entry in sortedEntries)
+            {
+                if (startfrequent >= maxfrequent)
+                    break;
 
-						if (startfrequent >= maxfrequent)
-						{
-							break; // Break if maxfrequent limit reached
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					System.Windows.MessageBox.Show("Error reading UserAssist entries: " + ex.Message);
-				}
-			}
-		}
+                string title = GetFrequentEntryName(entry.DecodedName);
+
+                if (string.IsNullOrWhiteSpace(title))
+                    continue;
+
+                string[] TSCNoFlyList =
+                {
+                    "Secondsystem",
+                    "Version Reporter Applet",
+                    "Control Panel",
+                    "DirectStart",
+                    "Start menu"
+                };
+
+                if (TSCNoFlyList.Any(b =>
+                    title.IndexOf(b, StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    continue;
+                }
+
+                Recent.Add(new StartMenuLink
+                {
+                    Title = title,
+                    Icon = IconHelper.GetFileIcon(entry.DecodedName),
+                    Link = entry.DecodedName
+                });
+
+                startfrequent++;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show("Error reading UserAssist entries: " + ex.Message);
+        }
+    }
+
 
 		private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{

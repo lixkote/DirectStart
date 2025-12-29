@@ -155,7 +155,7 @@ namespace B8TAM
             {
                 return DefaultTileColors.Pink;
             }
-            if (new[] { "winspy" }.Contains(tilename))
+            if (new[] { "winspy", "Core Temp" }.Contains(tilename))
             {
                 return DefaultTileColors.Purple;
             }
@@ -170,6 +170,10 @@ namespace B8TAM
             if (new[] { "Documents", "Command Prompt", "cmd" }.Contains(tilename))
             {
                 return DefaultTileColors.Gray;
+            }
+            if (new[] { "Calculator", "Task Manager", "Paint", "Notepad" }.Contains(tilename))
+            {
+                return DefaultTileColors.Teal;
             }
 
             switch (customtilecolor.ToLower())
