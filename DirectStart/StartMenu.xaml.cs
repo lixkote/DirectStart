@@ -178,7 +178,7 @@ namespace B8TAM
 
 			DUIColorize();
             LoadTiles();
-			AdjustToTaskbar();
+			AdjustToTaskbarReworked();
             bool RoundedUserProfileShape = (bool)System.Windows.Application.Current.Resources["RoundedUserProfileShape"];
             bool Force10BetaStartButton = (bool)System.Windows.Application.Current.Resources["Force10BetaStartButton"];
             bool UseLegacyMenuIntercept = (bool)System.Windows.Application.Current.Resources["UseLegacyMenuIntercept"];
@@ -223,62 +223,30 @@ namespace B8TAM
             }
         }
 
-        private double GetTaskbarHeight()
-        {
-            // First, try to get taskbar height using Screen class
-            double taskbarHeight = GetTaskbarHeightUsingScreenClass();
-
-            // If the taskbar height obtained is non-negative, return it
-            if (taskbarHeight >= 0)
-                return taskbarHeight;
-
-            // If the taskbar height obtained is negative, try an alternate method
-            taskbarHeight = GetTaskbarHeightUsingShell32();
-
-            return taskbarHeight;
-        }
-
-        private double GetTaskbarHeightUsingScreenClass()
+        private double GetTaskbarHeight(Screen screen)
         {
             try
             {
-                // Get the working area of the screen (excluding the taskbar)
-                Rectangle workingArea = Screen.PrimaryScreen.WorkingArea;
+                Rectangle bounds = screen.Bounds;
+                Rectangle working = screen.WorkingArea;
 
-                // Get the total area of the screen
-                Rectangle screenArea = Screen.PrimaryScreen.Bounds;
+                int heightDiff = bounds.Height - working.Height;
+                int widthDiff = bounds.Width - working.Width;
 
-                // Calculate the taskbar height by subtracting the working area height from the total screen height
-                double taskbarHeight = screenArea.Height - workingArea.Height;
+                if (heightDiff > 0)
+                    return heightDiff;
 
-                return taskbarHeight;
+                if (widthDiff > 0)
+                    return widthDiff;
+
+                return 0;
             }
             catch
             {
-                // Handle any exceptions gracefully
-                return -1;
+                return 0;
             }
         }
 
-        private double GetTaskbarHeightUsingShell32()
-        {
-            try
-            {
-                APPBARDATA appBarData = new APPBARDATA();
-                appBarData.cbSize = (uint)Marshal.SizeOf(appBarData);
-                IntPtr result = SHAppBarMessage(ABM_GETTASKBARPOS, ref appBarData);
-                if (result == IntPtr.Zero)
-                    return -1;
-
-                RECT taskbarRect = appBarData.rc;
-                return taskbarRect.Bottom - taskbarRect.Top;
-            }
-            catch
-            {
-                // Handle any exceptions gracefully
-                return -1;
-            }
-        }
 
         // P/Invoke declarations
         [StructLayout(LayoutKind.Sequential)]
@@ -358,170 +326,93 @@ namespace B8TAM
             }
             catch
             {
-                // Handle any exceptions gracefully
                 return -1;
             }
         }
+        private double _baseMenuHeight = -1;
+        private double _baseMenuWidth = -1;
 
-        private void AdjustToTaskbar()
+
+        private void AdjustToTaskbarReworked()
         {
-			var desktopWorkingArea = SystemParameters.WorkArea;
-			// Get the screen
-			Screen screen = Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(this).Handle);
-            // Get the taskbar height
-            taskbarheightinpx = GetTaskbarHeight();
+            Screen screen = Screen.FromPoint(System.Windows.Forms.Cursor.Position);
+
+            if (_baseMenuHeight < 0)
+                _baseMenuHeight = Menu.Height;
+
+            if (_baseMenuWidth < 0)
+                _baseMenuWidth = Menu.Width;
+
+            Menu.Height = _baseMenuHeight;
+            Menu.Width = _baseMenuWidth;
+            Menu.Margin = new Thickness(0);
+            Menu.Left = 0.0;
+
+            base.Left = screen.WorkingArea.Left;
+            base.Top = screen.WorkingArea.Top;
+
+            StartLogoTop.Visibility = Visibility.Hidden;
+            StartLogoBottom.Visibility = Visibility.Hidden;
+            StartLogoLeft.Visibility = Visibility.Hidden;
+            StartLogoRight.Visibility = Visibility.Hidden;
+
+            taskbarheightinpx = GetTaskbarHeight(screen);
             double taskbarwidthinpx = GetTaskbarWidth();
-			var taskbarPosition = GetTaskbarPosition.Taskbar.Position;
+            var taskbarPosition = GetTaskbarPosition.Taskbar.Position;
             Version osVersion = Environment.OSVersion.Version;
 
-            switch (taskbarPosition)
-			{
-				case GetTaskbarPosition.TaskbarPosition.Top:
-					StartMenuBackground.VerticalAlignment = VerticalAlignment.Bottom;
-					double ht = Menu.Height + taskbarheightinpx;
-					Menu.Height = ht;
-					base.Left = 0.0;
-					base.Top = 0.0;
-                    if (osVersion.Major == 6 && osVersion.Minor == 3)
-                    {
-						// Windows 8.1
-                        StartLogoTop.Visibility = Visibility.Visible;
-                    }
-                    else if (Force10BetaStartButton == true)
-                    {
-						// Windows 8
-                        StartLogoTop.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        StartLogoTop.Visibility = Visibility.Hidden;
-                    }
-                    StartLogoTop.Height = taskbarheightinpx + 1;
-					Menu.Margin = new Thickness(0, taskbarheightinpx, 0, 0);
-                    if (Force10BetaStartButton == true)
-                    {
-                        // Windows 8
-                        StartLogoTop.Visibility = Visibility.Visible;
-                    }
-                    break;
-				case GetTaskbarPosition.TaskbarPosition.Bottom:
-					// Taskbar on Bottom
-					StartMenuBackground.VerticalAlignment = VerticalAlignment.Top;
-					double hb = Menu.Height + taskbarheightinpx;
-					Menu.Height = hb;
-					base.Left = 0.0;
-					base.Top = SystemParameters.WorkArea.Bottom - base.Height + taskbarheightinpx;
-                    if (osVersion.Major == 6 && osVersion.Minor == 3)
-                    {
-                        // Windows 8.1
-                        StartLogoBottom.Visibility = Visibility.Visible;
-                    }
-                    else if (Force10BetaStartButton == true)
-                    {
-                        // Windows 8
-                        StartLogoBottom.Visibility = Visibility.Visible;
-                    }
-					else
-					{
-                        StartLogoBottom.Visibility = Visibility.Hidden;
-                    }
-					try
-					{
-                        StartLogoBottom.Height = taskbarheightinpx + 1;
-                        Menu.Margin = new Thickness(0, 0, 0, taskbarheightinpx);
-                        if (Force10BetaStartButton == true)
-                        {
-                            // Windows 8
-                            StartLogoBottom.Visibility = Visibility.Visible;
-                        }
-                    }
-					catch (Exception ex)
-					{
-                        StartLogoBottom.Height = 48 + 1;
-                        Menu.Margin = new Thickness(0, 0, 0, 48);
-                        if (Force10BetaStartButton == true)
-                        {
-                            // Windows 8
-                            StartLogoBottom.Visibility = Visibility.Visible;
-                        }
-                        Debug.WriteLine("Taskbar height exception: " + ex.ToString());
-					}
-                    break;
-				case GetTaskbarPosition.TaskbarPosition.Left:
-					// Taskbar on left
-					StartMenuBackground.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-					double hl = Menu.Width + taskbarwidthinpx;
-					Menu.Width = hl;
-					Menu.Left = 0.0;
-					base.Top = 0.0;
-					StartLogoLeft.Width = taskbarwidthinpx;
-                    if (osVersion.Major == 6 && osVersion.Minor == 3)
-                    {
-                        // Windows 8.1
-                        StartLogoLeft.Visibility = Visibility.Visible;
-                    }
-                    else if (Force10BetaStartButton == true)
-                    {
-                        // Windows 8
-                        StartLogoLeft.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        StartLogoLeft.Visibility = Visibility.Hidden;
-                    }
-					break;
-				case GetTaskbarPosition.TaskbarPosition.Right:
-					// Taskbar on right
-					StartMenuBackground.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-					double hr = Menu.Width + taskbarwidthinpx;
-					Menu.Width = hr;
-					base.Top = 0.0;
-					StartLogoRight.Width = taskbarwidthinpx;
-                    if (osVersion.Major == 6 && osVersion.Minor == 3)
-                    {
-                        // Windows 8.1
-                        StartLogoRight.Visibility = Visibility.Visible;
-                    }
-                    else if (Force10BetaStartButton == true)
-                    {
-                        // Windows 8
-                        StartLogoRight.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        StartLogoRight.Visibility = Visibility.Hidden;
-                    }
-                    break;
-				case GetTaskbarPosition.TaskbarPosition.Unknown:
-					// Default case where we cannot detect taskbar position
-					StartMenuBackground.VerticalAlignment = VerticalAlignment.Top;
-					double hu = Menu.Height + taskbarheightinpx;
-					Menu.Height = hu;
-					base.Left = 0.0;
-					base.Top = SystemParameters.WorkArea.Bottom - base.Height + taskbarheightinpx;
-                    if (osVersion.Major == 6 && osVersion.Minor == 3)
-                    {
-                        // Windows 8.1
-                        StartLogoBottom.Visibility = Visibility.Visible;
-                    }
-                    else if (Force10BetaStartButton == true)
-                    {
-                        // Windows 8
-                        StartLogoBottom.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        StartLogoBottom.Visibility = Visibility.Hidden;
-                    }
-                    StartLogoBottom.Height = taskbarheightinpx + 1;
-					Menu.Margin = new Thickness(0, 0, 0, taskbarheightinpx);
-					break;
-				default:
-					break;
-			}
-		}
+            bool showWin8Logo =
+                (osVersion.Major == 6 && osVersion.Minor == 3) || Force10BetaStartButton;
 
-		int maxfrequent = 5;
+            switch (taskbarPosition)
+            {
+                case GetTaskbarPosition.TaskbarPosition.Top:
+                    StartMenuBackground.VerticalAlignment = VerticalAlignment.Bottom;
+                    Menu.Height = _baseMenuHeight + taskbarheightinpx;
+
+                    StartLogoTop.Visibility = showWin8Logo ? Visibility.Visible : Visibility.Hidden;
+                    StartLogoTop.Height = taskbarheightinpx + 1;
+                    Menu.Margin = new Thickness(0, taskbarheightinpx, 0, 0);
+                    break;
+
+                case GetTaskbarPosition.TaskbarPosition.Bottom:
+                    StartMenuBackground.VerticalAlignment = VerticalAlignment.Top;
+                    Menu.Height = _baseMenuHeight + taskbarheightinpx;
+                    base.Top = screen.WorkingArea.Bottom - base.Height + taskbarheightinpx;
+
+                    StartLogoBottom.Visibility = showWin8Logo ? Visibility.Visible : Visibility.Hidden;
+
+                    StartLogoBottom.Height = taskbarheightinpx + 1;
+                    Menu.Margin = new Thickness(0, 0, 0, taskbarheightinpx);
+                    break;
+
+                case GetTaskbarPosition.TaskbarPosition.Left:
+                    Menu.Width = _baseMenuWidth + taskbarwidthinpx;
+
+                    StartLogoLeft.Width = taskbarwidthinpx;
+                    StartLogoLeft.Visibility = showWin8Logo ? Visibility.Visible : Visibility.Hidden;
+                    break;
+
+                case GetTaskbarPosition.TaskbarPosition.Right:
+                    Menu.Width = _baseMenuWidth + taskbarwidthinpx;
+
+                    StartLogoRight.Width = taskbarwidthinpx;
+                    StartLogoRight.Visibility = showWin8Logo ? Visibility.Visible : Visibility.Hidden;
+                    break;
+
+                case GetTaskbarPosition.TaskbarPosition.Unknown:
+                    StartMenuBackground.VerticalAlignment = VerticalAlignment.Top;
+                    Menu.Height = _baseMenuHeight + taskbarheightinpx;
+                    base.Top = screen.WorkingArea.Bottom - base.Height + taskbarheightinpx;
+
+                    StartLogoBottom.Visibility = showWin8Logo ? Visibility.Visible : Visibility.Hidden;
+                    StartLogoBottom.Height = taskbarheightinpx + 1;
+                    Menu.Margin = new Thickness(0, 0, 0, taskbarheightinpx);
+                    break;
+            }
+        }
+
+        int maxfrequent = 5;
 		int startfrequent = 0;
 
         private static string SmartCapitalizeFirstLetter(string text)
@@ -740,11 +631,12 @@ namespace B8TAM
                 }
                 else
                 {
-                    Show();
-                    // AdjustToTaskbar();
+                    AdjustToTaskbarReworked();
                     DUIColorize();
-                    WindowActivator.ActivateWindow(new System.Windows.Interop.WindowInteropHelper(Menu).Handle);
-                    SearchText.Focus();
+                    // SearchText.Focus();
+                    Show();
+                    this.Activate(); 
+                    this.Focus();    
                 }
             }
             catch (Exception ex)
@@ -1453,6 +1345,16 @@ namespace B8TAM
                 source.AddHook(WndProc);
             }
         }
+
+        private void Menu_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                OnStartTriggered(sender, e);
+                e.Handled = true;
+            }
+        }
+
     }
 
     public class RunCommand : ICommand

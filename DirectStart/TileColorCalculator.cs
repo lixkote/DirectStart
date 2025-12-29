@@ -155,6 +155,10 @@ namespace B8TAM
             {
                 return DefaultTileColors.Pink;
             }
+            if (new[] { "Snipping Tool" }.Contains(tilename))
+            {
+                return DefaultTileColors.Red;
+            }
             if (new[] { "winspy", "Core Temp" }.Contains(tilename))
             {
                 return DefaultTileColors.Purple;
