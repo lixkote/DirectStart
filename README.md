@@ -11,11 +11,10 @@ Supported operating systems:
 
 - Windows 8.1 **en-US english** build 9600
   
-Might also run on, but unsupported (Please do not report issues if ran on these OSes):
+Might also run on, but unsupported **(Please do not report issues if ran on these OSes)**:
 
 - Windows 10 and 11 **en-US english** all builds (Some features might not be available)
-- Windows 7 and Vista **en-US english** (With latest free Extended Kernel) (Start Menu background color broken)
-
+  
 ## Screenshots:
 
 ![DirectStart on 8.1 Screenshot](https://github.com/Lixkote/B8taMenu/blob/main/preview2.png)
