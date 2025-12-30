@@ -13,7 +13,7 @@ Supported operating systems:
   
 Might also run on, but unsupported **(Please do not report issues if ran on these OSes)**:
 
-- Windows 10 and 11 **en-US english** all builds (Some features might not be available)
+- Windows 10 and 11 **en-US english** all builds (Some features might not be available or broken)
   
 ## Screenshots:
 
