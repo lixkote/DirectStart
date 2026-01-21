@@ -119,6 +119,7 @@ namespace B8TAM
 			GetPrograms(programs);
 
 
+
             if (EnableMetroAppsLoad == true)
             {
                 // Searches and loads metro apps from these folders:
@@ -173,10 +174,16 @@ namespace B8TAM
             // startListView.GroupDescriptions.Add(startGroupDesc);
 
                 SearchGlyph.Source = Properties.Resources.searchglyph.ToBitmapImage();
-			// PowerGlyph.Source = Properties.Resources.powerglyph.ToBitmapImage();
-			UserNameText.Text = Environment.UserName;
+            // PowerGlyph.Source = Properties.Resources.powerglyph.ToBitmapImage();
 
-			DUIColorize();
+            // Get the god damn username from WMI
+            var searcher = new ManagementObjectSearcher("SELECT FullName FROM Win32_UserAccount WHERE Name='" + Environment.UserName + "'");
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                UserNameText.Text = obj["FullName"]?.ToString();
+            }
+
+            DUIColorize();
             LoadTiles();
 			AdjustToTaskbarReworked();
             bool RoundedUserProfileShape = (bool)System.Windows.Application.Current.Resources["RoundedUserProfileShape"];
