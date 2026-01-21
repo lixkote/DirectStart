@@ -86,6 +86,24 @@ namespace B8TAM
         [DllImport("user32.dll")]
         static extern byte MapVirtualKey(byte wCode, int wMap);
 
+        [DllImport("user32.dll")]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
+
+        [DllImport("kernel32.dll")]
+        static extern uint GetCurrentThreadId();
+
+        [DllImport("user32.dll")]
+        static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool BringWindowToTop(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern int ShowWindow(IntPtr hWnd, uint Msg);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
         public SolidColorBrush PressedBackground
         {
             get
@@ -134,7 +152,7 @@ namespace B8TAM
                 LoadMetroApps(immersiveSet);
 
                 // Warning: Metro apps load function is unfinished and can cause crashes!
-                // Blame M$ for not giving any useful way to load them in c#
+                // Blame M$ for not giving any useful way to load them in WPF
             }
 
 
@@ -558,6 +576,8 @@ namespace B8TAM
                         "CompMgmtLauncher",
                         "Control Panel",
                         "DirectStart",
+                        "Start Menu",
+                        "StartMenu",
                         "Start menu"
                     };
 
@@ -676,24 +696,6 @@ namespace B8TAM
             CloseProgramslist();
         }
 
-        [DllImport("user32.dll")]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
-
-        [DllImport("kernel32.dll")]
-        static extern uint GetCurrentThreadId();
-
-        [DllImport("user32.dll")]
-        static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern bool BringWindowToTop(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern int ShowWindow(IntPtr hWnd, uint Msg);
-
-        [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
-
         public static void ForceForegroundWindow(IntPtr hwnd)
         {
             uint windowThreadProcessId = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
@@ -705,9 +707,7 @@ namespace B8TAM
             AttachThreadInput(windowThreadProcessId, currentThreadId, false);
         }
 
-
-
-        public async void ToggleStartMenu()
+        public void ToggleStartMenu()
         {
             if ((DateTime.UtcNow - _lastHideTime).TotalMilliseconds < HideCooldownMs)
                 return;
@@ -718,18 +718,10 @@ namespace B8TAM
             }
             DUIColorize();
             AdjustToTaskbarReworked();
-            //this.Activate();
-
             IntPtr hwnd = new WindowInteropHelper(this).Handle;
             ForceForegroundWindow(hwnd);
-
             this.Show();
-            //this.Focus();
-            //var helper = new WindowInteropHelper(this);
-            //SetForegroundWindow(helper.Handle);
-
-
-
+            this.Focus();
         }
 
         private void HandleCheck(object sender, RoutedEventArgs e)
@@ -1060,8 +1052,8 @@ namespace B8TAM
         {
             try
             {
-                // Get all processes named "DirectStart.exe"
-                var processes = Process.GetProcessesByName("DirectStart");
+                // Get all processes named "StartMenu.exe"
+                var processes = Process.GetProcessesByName("StartMenu");
 
                 if (processes.Length == 0)
                 {
