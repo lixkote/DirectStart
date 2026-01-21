@@ -34,6 +34,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using static B8TAM.TilesLoader;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Color = System.Windows.Media.Color;
 using File = System.IO.File;
 using MessageBox = System.Windows.MessageBox;
@@ -768,24 +769,55 @@ namespace B8TAM
             }
         }
 
-        private void GetPrograms(string directory)
-		{
-			foreach (string f in Directory.GetFiles(directory))
-			{
-				if (System.IO.Path.GetExtension(f) != ".ini")
-				{
-					Programs.Add(new StartMenuLink
-					{
-						Title = System.IO.Path.GetFileNameWithoutExtension(f),
-						Icon = IconHelper.GetFileIcon(f),
-						Link = f
-					});
-				}
-			}
-			GetProgramsRecurse(directory);
-		}
 
-		private void GetPinned(string directory)
+        // Blacklist of useless shitty entries
+        private static readonly HashSet<string> useless = new HashSet<string>(
+        StringComparer.OrdinalIgnoreCase)
+        {
+            "Desktop",
+            "DirectStart",
+            "StartMenu",
+            "Immersive Control Panel",
+            "Search"
+        };
+
+        // replace dumb internal system titles
+        private static readonly Dictionary<string, string> dumbtitlereplacements =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Windows.Defender", "Windows Defender" },
+            { "computer", "This PC" },
+            { "StartUp", "Startup" }
+        };
+
+        private void GetPrograms(string directory)
+        {
+            foreach (string f in Directory.GetFiles(directory))
+            {
+                if (Path.GetExtension(f) == ".ini")
+                    continue;
+
+                string title = Path.GetFileNameWithoutExtension(f);
+                if (useless.Contains(title))
+                    continue;
+                if (dumbtitlereplacements.TryGetValue(title, out string replacedTitle))
+                {
+                    title = replacedTitle;
+                }
+
+                Programs.Add(new StartMenuLink
+                {
+                    Title = title,
+                    Icon = IconHelper.GetFileIcon(f),
+                    Link = f
+                });
+            }
+
+            GetProgramsRecurse(directory);
+        }
+
+
+        private void GetPinned(string directory)
 		{
 			foreach (string f in Directory.GetFiles(directory))
 			{
@@ -801,58 +833,81 @@ namespace B8TAM
 			}
 			GetProgramsRecurse(directory);
 		}
-		private void GetProgramsRecurse(string directory, StartMenuDirectory parent = null)
-		{
-			bool hasParent = parent != null;
-			foreach (string d in Directory.GetDirectories(directory))
-			{
-				StartMenuDirectory folderEntry = null;
-				if (!hasParent)
-				{
-					folderEntry = Programs.FirstOrDefault(x => x.Title == new DirectoryInfo(d).Name) as StartMenuDirectory;
-				}
-				if (folderEntry == null)
-				{
-					folderEntry = new StartMenuDirectory
-					{
-						Title = new DirectoryInfo(d).Name,
-						Links = new ObservableCollection<StartMenuLink>(),
-						Directories = new ObservableCollection<StartMenuDirectory>(),
-						Link = d,
-						Icon = IconHelper.GetFolderIcon(d)
-					};
-				}
-				
-				GetProgramsRecurse(d, folderEntry);
-				foreach (string f in Directory.GetFiles(d))
-				{
-					folderEntry.HasChildren = true;
-					if (System.IO.Path.GetExtension(f) != ".ini")
-					{
-						folderEntry.Links.Add(new StartMenuLink
-						{
-							Title = System.IO.Path.GetFileNameWithoutExtension(f),
-							Icon = IconHelper.GetFileIcon(f),
-							Link = f
-						});
-					}
-				}
-				
-				if (!hasParent)
-				{
-					if (!Programs.Contains(folderEntry))
-					{
-						Programs.Add(folderEntry);
-					}
-				}
-				else
-				{
-					parent.Directories.Add(folderEntry);
-				}
-			}
-		}
-		
-		private void Link_Click(object sender, RoutedEventArgs e)
+        private void GetProgramsRecurse(string directory, StartMenuDirectory parent = null)
+        {
+            bool hasParent = parent != null;
+
+            foreach (string d in Directory.GetDirectories(directory))
+            {
+                string dirTitle = new DirectoryInfo(d).Name;
+                if (useless.Contains(dirTitle))
+                    continue;
+                if (dumbtitlereplacements.TryGetValue(dirTitle, out string replacedDirTitle))
+                {
+                    dirTitle = replacedDirTitle;
+                }
+
+                StartMenuDirectory folderEntry = null;
+
+                if (!hasParent)
+                {
+                    folderEntry = Programs
+                        .FirstOrDefault(x => x.Title.Equals(dirTitle, StringComparison.OrdinalIgnoreCase))
+                        as StartMenuDirectory;
+                }
+
+                if (folderEntry == null)
+                {
+                    folderEntry = new StartMenuDirectory
+                    {
+                        Title = dirTitle,
+                        Links = new ObservableCollection<StartMenuLink>(),
+                        Directories = new ObservableCollection<StartMenuDirectory>(),
+                        Link = d,
+                        Icon = IconHelper.GetFolderIcon(d)
+                    };
+                }
+                GetProgramsRecurse(d, folderEntry);
+
+                foreach (string f in Directory.GetFiles(d))
+                {
+                    if (Path.GetExtension(f) == ".ini")
+                        continue;
+
+                    string fileTitle = Path.GetFileNameWithoutExtension(f);
+                    if (useless.Contains(fileTitle))
+                        continue;
+                    if (dumbtitlereplacements.TryGetValue(fileTitle, out string replacedFileTitle))
+                    {
+                        fileTitle = replacedFileTitle;
+                    }
+
+                    folderEntry.HasChildren = true;
+
+                    folderEntry.Links.Add(new StartMenuLink
+                    {
+                        Title = fileTitle,
+                        Icon = IconHelper.GetFileIcon(f),
+                        Link = f
+                    });
+                }
+
+                if (!hasParent)
+                {
+                    if (!Programs.Contains(folderEntry))
+                    {
+                        Programs.Add(folderEntry);
+                    }
+                }
+                else
+                {
+                    parent.Directories.Add(folderEntry);
+                }
+            }
+        }
+
+
+        private void Link_Click(object sender, RoutedEventArgs e)
 		{
 			Link_Click(sender, null);
 		}
