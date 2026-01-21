@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Title="Start menu" Width="533" SizeToContent="Manual" Height="519.9" Left="0" x:Name="Menu" DataContext="{Binding ElementName=Menu}"
 		AllowsTransparency="True" WindowStyle="None" Visibility="Visible" 
-		ShowInTaskbar="False" PreviewKeyDown="Menu_KeyDown" SourceInitialized="Menu_SourceInitialized" Deactivated="Menu_Deactivated" FontFamily="Segoe UI" Topmost="True" BorderThickness="1" Loaded="Menu_Loaded" Background="{x:Null}" Margin="0">
+		ShowInTaskbar="False" PreviewKeyDown="Menu_KeyDown" SourceInitialized="Menu_SourceInitialized" Deactivated="Menu_Deactivated" FontFamily="Segoe UI" Topmost="True" BorderThickness="1" Loaded="Menu_Loaded" Background="{x:Null}" Margin="0" HorizontalAlignment="Left">
     <Window.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -20,6 +20,37 @@
                 <local:InvertBooleanConverter/>
                 <BooleanToVisibilityConverter/>
             </local:ValueConverterGroup>
+            <Style x:Key="TileFocusVisual" TargetType="Control">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Control">
+                            <Grid>
+                                <Rectangle Margin="-3" StrokeThickness="2" Stroke="White"/>
+                                <Rectangle Margin="-1" StrokeThickness="1" Stroke="Black"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="MetroElementFocusVisual" TargetType="Control">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Control">
+                            <Rectangle Margin="0" StrokeThickness="2" Stroke="White"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="SimpleHighlightFocusVisual" TargetType="Control">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Control">
+                            <Grid Background="#33FFFFFF">
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <Style x:Key="AnimatedButtonStyle" TargetType="Button">
                 <Setter Property="Width" Value="100"/>
                 <Setter Property="Height" Value="40"/>
@@ -69,7 +100,7 @@
             <TextBlock Style="{StaticResource IsSkinSupportDuiBackgroundColor}" x:Name="IsSkinSupportDuiBackgroundColor" Visibility="Collapsed"></TextBlock>
             <TextBlock Style="{StaticResource IsSkinSupportDwmBlur}" x:Name="IsDwmBlurEnabled" Visibility="Collapsed"></TextBlock>
             <Border x:Name="BackgroundBorder" BorderThickness="0,1,1,1" Margin="0,0,5,0" Grid.ColumnSpan="2"/>
-            <ItemsControl dd:DragDrop.IsDropTarget="True" dd:DragDrop.UseVisualSourceItemSizeForDragAdorner="True" dd:DragDrop.IsDragSource="True" x:Name="TilesHost" Grid.Column="1" Margin="0,3,0,0">
+            <ItemsControl FocusVisualStyle="{x:Null}" dd:DragDrop.IsDropTarget="True" dd:DragDrop.UseVisualSourceItemSizeForDragAdorner="True" dd:DragDrop.IsDragSource="True" x:Name="TilesHost" Grid.Column="1" Margin="0,3,0,0">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel VerticalAlignment="Top"/>
@@ -77,7 +108,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type local:Tile}">
-                        <local:TileControl x:Name="TileC" Click="Tile_Click" Size="{Binding Size}" Style="{DynamicResource ColoredTile}" Icon="{Binding Icon}" Title="{Binding Title}" FontSize="6" HorizontalAlignment="Left" Margin="3,5,5,3" Width="NaN" Height="NaN" VerticalAlignment="Top">
+                        <local:TileControl FocusVisualStyle="{DynamicResource TileFocusVisual}" x:Name="TileC" Click="Tile_Click" Size="{Binding Size}" Style="{DynamicResource ColoredTile}" Icon="{Binding Icon}" Title="{Binding Title}" FontSize="6" HorizontalAlignment="Left" Margin="3,5,5,3" Width="NaN" Height="NaN" VerticalAlignment="Top">
                             <local:TileControl.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Click="UnpinTile_Click" x:Name="UnpinTile" Header="Unpin from Start"></MenuItem>
@@ -100,7 +131,7 @@
                 <Grid>
                     <Grid x:Name="GridPrograms" Margin="0,0,0,81" >
                         <ScrollViewer x:Name="ProgramsListScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="0" Grid.Column="1" Margin="5,0,0,0">
-                            <ItemsControl x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
+                            <ItemsControl  x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
                                 <ItemsControl.Resources>
                                     <DataTemplate x:Name="listViewData" DataType="{x:Type local:StartMenuLink}">
                                         <StackPanel HorizontalAlignment="Stretch" Background="Transparent">                                            
@@ -187,14 +218,14 @@
                             </ItemsControl>
                         </ScrollViewer>
                     </Grid>
-                    <Grid x:Name="GridTogglable" Margin="0,0,0,81" >
+                    <Grid x:Name="GridTogglable" FocusVisualStyle="{x:Null}" Margin="0,0,0,81" >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="36"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid x:Name="DesktopStartHeaderPane" VerticalAlignment="Top" Height="30">
-                            <ToggleButton Style="{DynamicResource MetroAnimatedToggleButton}" Grid.Row="0" Click="PowerButton_Click" x:Name="PowerButton" Foreground="White" TextOptions.TextHintingMode="Fixed" FontWeight="Medium" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="30" Height="30" Margin="222,0,0,0">
+                            <ToggleButton FocusVisualStyle="{DynamicResource MetroElementFocusVisual}" Style="{DynamicResource MetroAnimatedToggleButton}" Grid.Row="0" Click="PowerButton_Click" x:Name="PowerButton" Foreground="White" TextOptions.TextHintingMode="Fixed" FontWeight="Medium" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="30" Height="30" Margin="222,0,0,0">
                                 <TextBlock x:Name="PowerFontGlyph" Style="{DynamicResource PowerGlyphStyleText}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
                                 <FrameworkElement.ContextMenu>
                                     <local:ImmesiveContextMenu x:Name="PowerMenu" Style="{DynamicResource PowerMenuStyle}">
@@ -205,7 +236,7 @@
                                     </local:ImmesiveContextMenu>
                                 </FrameworkElement.ContextMenu>
                             </ToggleButton>
-                            <ToggleButton Grid.Row="0" Click="UserImageButton_Click" x:Name="UserImageButton" HorizontalAlignment="Left" Style="{DynamicResource MetroAnimatedToggleButton}">
+                            <ToggleButton Grid.Row="0" FocusVisualStyle="{DynamicResource MetroElementFocusVisual}" Click="UserImageButton_Click" x:Name="UserImageButton" HorizontalAlignment="Left" Style="{DynamicResource MetroAnimatedToggleButton}">
                                 <FrameworkElement.ContextMenu>
                                     <local:ImmesiveContextMenu x:Name="UserMenu" Style="{DynamicResource UserMenuStyle}">
                                         <MenuItem Header="{DynamicResource chgpic}" x:Name="UserImageChangeMenuItem" Click="UserImageChangeMenuItem_Click" />
@@ -214,7 +245,7 @@
                                     </local:ImmesiveContextMenu>
                                 </FrameworkElement.ContextMenu>
                                 <Grid x:Name="grid" Margin="2,0,0,0">
-                                    <TextBlock x:Name="UserNameText" Style="{StaticResource GDIText}" Text="%USERNAME%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,2" FontSize="15" Foreground="White" />
+                                    <TextBlock x:Name="UserNameText" Style="{StaticResource GDIText}" Text="%USERNAME%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="29,0,5,2" FontSize="15" Foreground="White" />
                                     <Grid Width="26" SnapsToDevicePixels="True" Height="26" HorizontalAlignment="Left">
                                         <WrapPanel Name ="container">
                                             <Image x:Name="userpfp"  RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="UniformToFill"/>
@@ -233,7 +264,7 @@
                             </ToggleButton>
                         </Grid>
                         <Grid  Style="{DynamicResource Separator}" Height="1" VerticalAlignment="Top" Margin="0,35,0,0"/>
-                        <ItemsControl Style="{DynamicResource Separator2}" BorderThickness="0,0,0,1" dd:DragDrop.IsDropTarget="True" dd:DragDrop.IsDragSource="True" x:Name="PinnedItems" Background="Transparent" Margin="0,4" VerticalAlignment="Top" Grid.Row="1">
+                        <ItemsControl FocusVisualStyle="{x:Null}" Style="{DynamicResource Separator2}" BorderThickness="0,0,0,1" dd:DragDrop.IsDropTarget="True" dd:DragDrop.IsDragSource="True" x:Name="PinnedItems" Background="Transparent" Margin="0,4" VerticalAlignment="Top" Grid.Row="1">
                             <ItemsControl.Resources>
                                 <DataTemplate x:Name="listViewDataPinned" DataType="{x:Type local:StartMenuLink}">
                                     <StackPanel Orientation="Horizontal" Height="40" MouseEnter="Item_MouseEnter" MouseLeave="Item_MouseLeave" OverridesDefaultStyle="False" MouseLeftButtonUp="Link_Click">
@@ -287,7 +318,7 @@
                                 </DataTemplate>
                             </ItemsControl.Resources>
                         </ItemsControl>
-                        <ItemsControl dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="False" x:Name="RecentApps" Margin="0,0,0,4" VerticalAlignment="Bottom" Grid.Row="2">
+                        <ItemsControl FocusVisualStyle="{x:Null}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="False" x:Name="RecentApps" Margin="0,0,0,4" VerticalAlignment="Bottom" Grid.Row="2">
                             <ItemsControl.ItemContainerStyle>
                                 <Style>
                                     <Setter Property="Control.Margin" Value="0,2,0,0" />
@@ -348,7 +379,7 @@
                     </Grid>
 
 
-                    <ToggleButton x:Name="AppsToggle" Height="34" VerticalAlignment="Bottom" Margin="0,0,0,40" Checked="HandleCheck" Unchecked="HandleUnchecked" HorizontalContentAlignment="Left">
+                    <ToggleButton FocusVisualStyle="{DynamicResource SimpleHighlightFocusVisual}" x:Name="AppsToggle" Height="34" VerticalAlignment="Bottom" Margin="0,0,0,40" Checked="HandleCheck" Unchecked="HandleUnchecked" HorizontalContentAlignment="Left">
                         <Grid>
                             <TextBlock x:Name="ToggleButtonText" Style="{StaticResource GDIText}" Text="{DynamicResource allapps}"  Height="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="40,0,0,0" Foreground="White"/>
                             <TextBlock x:Name="ToggleButtonTextBack" Visibility="Collapsed" Style="{StaticResource GDIText}" Text="{DynamicResource allappsback}"  Height="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="40,0,0,0" Foreground="White"/>
@@ -376,16 +407,16 @@ Visibility="{Binding Text.IsEmpty, Converter={StaticResource BoolToVis}, Element
                 </Grid>
             </Grid>
         </Grid>
-        <Button Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoTop" Margin="-1,-1,0,-1" Width="49" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
+        <Button FocusVisualStyle="{x:Null}" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoTop" Margin="-1,-1,0,-1" Width="49" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
-        <Button Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoLeft" Margin="-1,-1,0,0" Width="52" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
+        <Button FocusVisualStyle="{x:Null}" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoLeft" Margin="-1,-1,0,0" Width="52" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
-        <Button Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoRight" Margin="-1,-1,0,0" Width="53" HorizontalAlignment="Right" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40">
+        <Button FocusVisualStyle="{x:Null}" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoRight" Margin="-1,-1,0,0" Width="53" HorizontalAlignment="Right" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
-        <Button  Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoBottom" Margin="-1,518,0,-1" Width="50" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" Height="41" VerticalAlignment="Bottom">
+        <Button FocusVisualStyle="{x:Null}"  Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoBottom" Margin="-1,518,0,-1" Width="50" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" Height="41" VerticalAlignment="Bottom">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True" Margin="0,0,0,0"/>
         </Button>
     </Grid>

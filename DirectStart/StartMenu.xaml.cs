@@ -351,7 +351,7 @@ namespace B8TAM
                 _baseMenuWidth = Menu.Width;
 
             Menu.Height = _baseMenuHeight;
-            Menu.Width = _baseMenuWidth;
+            // Menu.Width = _baseMenuWidth;
             Menu.Margin = new Thickness(0);
             Menu.Left = 0.0;
 

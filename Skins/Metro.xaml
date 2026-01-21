@@ -4,7 +4,7 @@
 
     <!-- Name: Default DirectStart skin (Metro) -->
     <!-- Author: Lixkote -->
-    <!-- Year: 2025 -->
+    <!-- Year: 2026 -->
     <!-- Description: This is the default Windows RT Update 3 or Windows 10 Technical Preview-like DirectStart style -->
 
     <Style x:Key="IsSkinSupportDwmBlur" TargetType="{x:Type TextBlock}">
@@ -501,8 +501,8 @@
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                         Orientation="Horizontal">
                                     <ContentPresenter RecognizesAccessKey="True" />
-                                    <Image Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" Margin="0,0,0,28" VerticalAlignment="Center" HorizontalAlignment="Center" Width="48" Height="48"/>
-                                    <TextBlock VerticalAlignment="Center"
+                                    <Image Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" Margin="0,2,0,26" VerticalAlignment="Center" HorizontalAlignment="Center" Width="48" Height="48"/>
+                                    <TextBlock VerticalAlignment="Center" Margin="-2,0,0,1"
                                            FontSize="{TemplateBinding CountFontSize}"
                                            Text="{TemplateBinding Count}" />
                                 </StackPanel>
@@ -627,6 +627,16 @@
     </Style>
     <Style x:Key="ColoredTile" TargetType="local:TileControl">
         <Style.Resources>
+			<Style TargetType="Border" x:Key="HoverBorderStyle">
+				<Setter Property="BorderThickness" Value="0"/>
+				<Setter Property="BorderBrush" Value="White"/>
+				<Setter Property="Background" Value="Transparent"/>
+				<Style.Triggers>
+					<Trigger Property="IsMouseOver" Value="True">
+						<Setter Property="BorderThickness" Value="2"/>
+					</Trigger>
+				</Style.Triggers>
+			</Style>
             <local:FileToIconConverter x:Key="fic" />
         </Style.Resources>
         <Setter Property="Background" >
@@ -663,7 +673,9 @@
                             BorderBrush="Black"
                             BorderThickness="2"
                             Opacity="0"
+							Style="{StaticResource HoverBorderStyle}"
                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+							
                         <Grid>
                             <StackPanel HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -671,15 +683,16 @@
                                 <ContentPresenter RecognizesAccessKey="True" />
                                 <TextBlock x:Name="size" Text="48" Visibility="Collapsed"></TextBlock>
                                 <TextBlock x:Name="path" Text="{Binding EXEPath}" Visibility="Collapsed"></TextBlock>
-                                <Image x:Name="Icon" Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,28" Width="48" Height="48" Stretch="Fill">
+                                <Image x:Name="Icon" Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2,0,26" Width="48" Height="48" Stretch="Fill">
                                 </Image>
                                 <TextBlock VerticalAlignment="Center"
                                            FontSize="{TemplateBinding CountFontSize}"
                                            Text="{TemplateBinding Count}" />
                             </StackPanel>
-                            <TextBlock x:Name="TitleBlock" Margin="14,0,0,4"
-                                            FontSize="12"
-                                            
+                            <TextBlock x:Name="TitleBlock" Margin="16,0,0,6"
+                                            FontSize="12"      
+											LineHeight="13"
+											LineStackingStrategy="BlockLineHeight"
                                             FontFamily="Segoe UI"
                                             HorizontalAlignment="{TemplateBinding HorizontalTitleAlignment}"
                                             VerticalAlignment="{TemplateBinding VerticalTitleAlignment}"
