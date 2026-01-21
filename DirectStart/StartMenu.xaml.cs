@@ -33,6 +33,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using static B8TAM.TilesLoader;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Color = System.Windows.Media.Color;
 using File = System.IO.File;
 using MessageBox = System.Windows.MessageBox;
@@ -42,7 +43,7 @@ namespace B8TAM
 	/// <summary>
 	/// Interaction logic for StartMenu.xaml
 	/// </summary>
-	public partial class StartMenu : Window
+	public partial class StartMenu : System.Windows.Window
 	{
 		LegacyStartMenuIntercepter _listener;
 		FrequentAppsHelper frequentHelper;
@@ -64,8 +65,12 @@ namespace B8TAM
         bool EnableMetroAppsLoad;
         bool UseLegacyMenuIntercept;
 
-        public const int WH_START_TRIGGERED = 0x8001; 
+        public const int WH_START_TRIGGERED = 0x8001;
 
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
 
 
         double taskbarheightinpx;
@@ -671,8 +676,38 @@ namespace B8TAM
             CloseProgramslist();
         }
 
+        [DllImport("user32.dll")]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
 
-        public void ToggleStartMenu()
+        [DllImport("kernel32.dll")]
+        static extern uint GetCurrentThreadId();
+
+        [DllImport("user32.dll")]
+        static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool BringWindowToTop(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern int ShowWindow(IntPtr hWnd, uint Msg);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        public static void ForceForegroundWindow(IntPtr hwnd)
+        {
+            uint windowThreadProcessId = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
+            uint currentThreadId = GetCurrentThreadId();
+            uint CONST_SW_SHOW = 5;
+            AttachThreadInput(windowThreadProcessId, currentThreadId, true);
+            BringWindowToTop(hwnd);
+            ShowWindow(hwnd, CONST_SW_SHOW);
+            AttachThreadInput(windowThreadProcessId, currentThreadId, false);
+        }
+
+
+
+        public async void ToggleStartMenu()
         {
             if ((DateTime.UtcNow - _lastHideTime).TotalMilliseconds < HideCooldownMs)
                 return;
@@ -683,9 +718,18 @@ namespace B8TAM
             }
             DUIColorize();
             AdjustToTaskbarReworked();
-            Show();
-            Activate();
-            Focus();
+            //this.Activate();
+
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
+            ForceForegroundWindow(hwnd);
+
+            this.Show();
+            //this.Focus();
+            //var helper = new WindowInteropHelper(this);
+            //SetForegroundWindow(helper.Handle);
+
+
+
         }
 
         private void HandleCheck(object sender, RoutedEventArgs e)
@@ -1040,7 +1084,7 @@ namespace B8TAM
         private void Menu_Loaded(object sender, RoutedEventArgs e)
         {
             var hwnd = new WindowInteropHelper(this).Handle;
-            SetWindowText(hwnd, "DirectStartWindow"); 
+            SetWindowText(hwnd, "StartMenu"); 
             GridPrograms.Visibility = Visibility.Collapsed;
 		}
 

@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>explorer.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -140,6 +140,7 @@
     <Compile Include="LegacyStartMenuIntercepter.cs" />
     <Compile Include="StartMenuEntry.cs" />
     <Compile Include="WindowActivator.cs" />
+    <Compile Include="WindowUtilities.cs" />
     <Page Include="MultiLang\StringResources.pl-PL.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -196,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico" />
+    <Resource Include="explorer.ico" />
     <Content Include="Resources\folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
