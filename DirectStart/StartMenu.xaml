@@ -25,8 +25,8 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Control">
                             <Grid>
-                                <Rectangle Margin="-3" StrokeThickness="2" Stroke="White"/>
-                                <Rectangle Margin="-1" StrokeThickness="1" Stroke="Black"/>
+                                <Rectangle Margin="0,2,2,0" StrokeThickness="2" Stroke="White"/>
+                                <Rectangle Margin="2,4,4,2" StrokeThickness="1" Stroke="Black"/>
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>
@@ -108,33 +108,33 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type local:Tile}">
-                        <local:TileControl FocusVisualStyle="{DynamicResource TileFocusVisual}" x:Name="TileC" Click="Tile_Click" Size="{Binding Size}" Style="{DynamicResource ColoredTile}" Icon="{Binding Icon}" Title="{Binding Title}" FontSize="6" HorizontalAlignment="Left" Margin="3,5,5,3" Width="NaN" Height="NaN" VerticalAlignment="Top">
-                            <local:TileControl.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Click="UnpinTile_Click" x:Name="UnpinTile" Header="Unpin from Start"></MenuItem>
-                                    <MenuItem Click="PinTaskbarTile_Click" Visibility="Collapsed" x:Name="PinTaskbarTile" Header="Pin to taskbar"></MenuItem>
-                                    <MenuItem Click="TileRunAsAdmin_Click"  x:Name="TileRunAsAdmin" Header="Run as administrator"></MenuItem>
-                                    <MenuItem Click="OpenFileLocationTile_Click" x:Name="OpenFileLocationTile" Header="Open file location"></MenuItem>
-                                    <MenuItem Header="Resize">
-                                        <MenuItem Click="ResizeTileSmall_Click" x:Name="ResizeTileSmall" Header="Small"></MenuItem>
-                                        <MenuItem Click="ResizeTileNormal_Click" x:Name="ResizeTileNormal" Header="Normal"></MenuItem>
-                                        <MenuItem Click="ResizeTileWide_Click" x:Name="ResizeTileWide" Header="Wide"></MenuItem>
-                                        <MenuItem Click="ResizeTileLarge_Click" x:Name="ResizeTileLarge" Header="Large"></MenuItem>
-                                    </MenuItem>
-                                </ContextMenu>
-                            </local:TileControl.ContextMenu>
-                        </local:TileControl>
+                            <local:TileControl Margin="0" FocusVisualStyle="{DynamicResource TileFocusVisual}" x:Name="TileC" Click="Tile_Click" Size="{Binding Size}" Style="{DynamicResource ColoredTile}" Icon="{Binding Icon}" Title="{Binding Title}" FontSize="6" HorizontalAlignment="Left" Width="NaN" Height="NaN" VerticalAlignment="Top">
+                                <local:TileControl.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Click="UnpinTile_Click" x:Name="UnpinTile" Header="Unpin from Start"></MenuItem>
+                                        <MenuItem Click="PinTaskbarTile_Click" Visibility="Collapsed" x:Name="PinTaskbarTile" Header="Pin to taskbar"></MenuItem>
+                                        <MenuItem Click="TileRunAsAdmin_Click"  x:Name="TileRunAsAdmin" Header="Run as administrator"></MenuItem>
+                                        <MenuItem Click="OpenFileLocationTile_Click" x:Name="OpenFileLocationTile" Header="Open file location"></MenuItem>
+                                        <MenuItem Header="Resize">
+                                            <MenuItem Click="ResizeTileSmall_Click" x:Name="ResizeTileSmall" Header="Small"></MenuItem>
+                                            <MenuItem Click="ResizeTileNormal_Click" x:Name="ResizeTileNormal" Header="Normal"></MenuItem>
+                                            <MenuItem Click="ResizeTileWide_Click" x:Name="ResizeTileWide" Header="Wide"></MenuItem>
+                                            <MenuItem Click="ResizeTileLarge_Click" x:Name="ResizeTileLarge" Header="Large"></MenuItem>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </local:TileControl.ContextMenu>
+                            </local:TileControl>
                     </DataTemplate>
                 </ItemsControl.Resources>
             </ItemsControl>
             <Grid Margin="7">
                 <Grid>
                     <Grid x:Name="GridPrograms" Margin="0,0,0,81" >
-                        <ScrollViewer x:Name="ProgramsListScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="0" Grid.Column="1" Margin="5,0,0,0">
-                            <ItemsControl  x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
+                        <ScrollViewer Focusable="False" x:Name="ProgramsListScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="0" Grid.Column="1" Margin="5,0,0,0">
+                            <ItemsControl Focusable="False" x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
                                 <ItemsControl.Resources>
                                     <DataTemplate x:Name="listViewData" DataType="{x:Type local:StartMenuLink}">
-                                        <StackPanel HorizontalAlignment="Stretch" Background="Transparent">                                            
+                                        <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">                                            
                                             <StackPanel.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
@@ -142,7 +142,7 @@
                                                     <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
                                                 </ContextMenu>
                                             </StackPanel.ContextMenu>
-                                            <ToggleButton Click="Link_Click" x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
+                                            <ToggleButton FocusVisualStyle="{DynamicResource SimpleHighlightFocusVisual}" Click="Link_Click" x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="20"/>
@@ -156,15 +156,15 @@
                                             </ToggleButton>
                                         </StackPanel>
                                     </DataTemplate>
-                                    <DataTemplate  x:Name="listViewAttr" DataType="{x:Type local:StartMenuDirectory}">
-                                        <StackPanel HorizontalAlignment="Stretch" Background="Transparent">
-                                            <ToggleButton x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
+                                    <DataTemplate x:Name="listViewAttr" DataType="{x:Type local:StartMenuDirectory}">
+                                        <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">
+                                            <ToggleButton FocusVisualStyle="{DynamicResource SimpleHighlightFocusVisual}" x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
                                                 <ToggleButton.ContextMenu>
                                                     <ContextMenu>
                                                         <MenuItem Header="Open" Click="Link_Click"/>
                                                     </ContextMenu>
                                                 </ToggleButton.ContextMenu>
-                                                <Grid>
+                                                <Grid Focusable="False">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="20"/>
                                                         <ColumnDefinition Width="*"/>
@@ -175,14 +175,14 @@
                                                     <TextBlock Grid.Column="1" Style="{StaticResource GDIText}" Text="{Binding Title}" Foreground="White" VerticalAlignment="Center" TextAlignment="Left"/>
                                                 </Grid>
                                             </ToggleButton>
-                                            <ItemsControl Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewAttr}" ItemsSource="{Binding Directories}" Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
+                                            <ItemsControl Focusable="False" Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewAttr}" ItemsSource="{Binding Directories}" Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
                                                 <ItemsControl.Template>
                                                     <ControlTemplate>
                                                         <ItemsPresenter/>
                                                     </ControlTemplate>
                                                 </ItemsControl.Template>
                                             </ItemsControl>
-                                            <ItemsControl Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewData}" ItemsSource="{Binding Links}"  Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
+                                            <ItemsControl Focusable="False" Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewData}" ItemsSource="{Binding Links}"  Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
                                                 <ItemsControl.Template>
                                                     <ControlTemplate>
                                                         <ItemsPresenter/>
@@ -191,8 +191,8 @@
                                             </ItemsControl>
                                         </StackPanel>
                                     </DataTemplate>
-                                    <DataTemplate x:Name="listViewMetroapp" DataType="{x:Type local:MetroApp}">
-                                        <StackPanel HorizontalAlignment="Stretch" Background="Transparent">
+                                    <DataTemplate  x:Name="listViewMetroapp" DataType="{x:Type local:MetroApp}">
+                                        <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">
                                             <StackPanel.ContextMenu>
                                                 <ContextMenu>
  
@@ -200,7 +200,7 @@
                                                     <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
                                                 </ContextMenu>
                                             </StackPanel.ContextMenu>
-                                            <ToggleButton Click="Link_Click" x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
+                                            <ToggleButton FocusVisualStyle="{DynamicResource SimpleHighlightFocusVisual}" Click="Link_Click" x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="20"/>
@@ -218,7 +218,7 @@
                             </ItemsControl>
                         </ScrollViewer>
                     </Grid>
-                    <Grid x:Name="GridTogglable" FocusVisualStyle="{x:Null}" Margin="0,0,0,81" >
+                    <Grid x:Name="GridTogglable" Focusable="False" Margin="0,0,0,81" >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="36"/>
                             <RowDefinition Height="Auto"/>
@@ -264,7 +264,7 @@
                             </ToggleButton>
                         </Grid>
                         <Grid  Style="{DynamicResource Separator}" Height="1" VerticalAlignment="Top" Margin="0,35,0,0"/>
-                        <ItemsControl FocusVisualStyle="{x:Null}" Style="{DynamicResource Separator2}" BorderThickness="0,0,0,1" dd:DragDrop.IsDropTarget="True" dd:DragDrop.IsDragSource="True" x:Name="PinnedItems" Background="Transparent" Margin="0,4" VerticalAlignment="Top" Grid.Row="1">
+                        <ItemsControl Focusable="False" Style="{DynamicResource Separator2}" BorderThickness="0,0,0,1" dd:DragDrop.IsDropTarget="True" dd:DragDrop.IsDragSource="True" x:Name="PinnedItems" Background="Transparent" Margin="0,4" VerticalAlignment="Top" Grid.Row="1">
                             <ItemsControl.Resources>
                                 <DataTemplate x:Name="listViewDataPinned" DataType="{x:Type local:StartMenuLink}">
                                     <StackPanel Orientation="Horizontal" Height="40" MouseEnter="Item_MouseEnter" MouseLeave="Item_MouseLeave" OverridesDefaultStyle="False" MouseLeftButtonUp="Link_Click">
@@ -280,8 +280,8 @@
                                     </StackPanel>
                                 </DataTemplate>
                                 <DataTemplate  x:Name="listViewAttrPinned" DataType="{x:Type local:StartMenuDirectory}">
-                                    <StackPanel HorizontalAlignment="Stretch" Background="Transparent">
-                                        <ToggleButton x:Name="collapse" IsChecked="False" Height="40" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
+                                    <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">
+                                        <ToggleButton FocusVisualStyle="{DynamicResource SimpleHighlightFocusVisual}" x:Name="collapse" IsChecked="False" Height="40" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
                                             <ToggleButton.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Open" Click="Link_Click"/>
@@ -300,17 +300,17 @@
                                                 <Path Grid.Column="2" Fill="White" Data="M 0 0 L 6 6 L 12 0 Z" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding IsVisible, Converter={StaticResource InvertAndVisibilitate}, ElementName=OpenArrow}"/>
                                             </Grid>
                                         </ToggleButton>
-                                        <ItemsControl Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewAttr}" ItemsSource="{Binding Directories}" Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
+                                        <ItemsControl Focusable="False" Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewAttr}" ItemsSource="{Binding Directories}" Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
                                             <ItemsControl.Template>
                                                 <ControlTemplate>
-                                                    <ItemsPresenter/>
+                                                    <ItemsPresenter Focusable="False"/>
                                                 </ControlTemplate>
                                             </ItemsControl.Template>
                                         </ItemsControl>
-                                        <ItemsControl Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewData}" ItemsSource="{Binding Links}"  Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
+                                        <ItemsControl Focusable="False" Margin="10,0,0,0" Visibility="{Binding IsChecked, Converter={StaticResource BoolToVis}, ElementName=collapse}" ItemTemplate="{DynamicResource listViewData}" ItemsSource="{Binding Links}"  Background="Transparent" HorizontalAlignment="Stretch"  BorderThickness="0">
                                             <ItemsControl.Template>
                                                 <ControlTemplate>
-                                                    <ItemsPresenter/>
+                                                    <ItemsPresenter Focusable="False"/>
                                                 </ControlTemplate>
                                             </ItemsControl.Template>
                                         </ItemsControl>
@@ -318,7 +318,7 @@
                                 </DataTemplate>
                             </ItemsControl.Resources>
                         </ItemsControl>
-                        <ItemsControl FocusVisualStyle="{x:Null}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="False" x:Name="RecentApps" Margin="0,0,0,4" VerticalAlignment="Bottom" Grid.Row="2">
+                        <ItemsControl Focusable="False" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="False" x:Name="RecentApps" Margin="0,0,0,4" VerticalAlignment="Bottom" Grid.Row="2">
                             <ItemsControl.ItemContainerStyle>
                                 <Style>
                                     <Setter Property="Control.Margin" Value="0,2,0,0" />
@@ -407,16 +407,16 @@ Visibility="{Binding Text.IsEmpty, Converter={StaticResource BoolToVis}, Element
                 </Grid>
             </Grid>
         </Grid>
-        <Button FocusVisualStyle="{x:Null}" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoTop" Margin="-1,-1,0,-1" Width="49" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
+        <Button Focusable="False" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoTop" Margin="-1,-1,0,-1" Width="49" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
-        <Button FocusVisualStyle="{x:Null}" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoLeft" Margin="-1,-1,0,0" Width="52" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
+        <Button Focusable="False" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoLeft" Margin="-1,-1,0,0" Width="52" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
-        <Button FocusVisualStyle="{x:Null}" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoRight" Margin="-1,-1,0,0" Width="53" HorizontalAlignment="Right" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40">
+        <Button Focusable="False" Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoRight" Margin="-1,-1,0,0" Width="53" HorizontalAlignment="Right" Background="#180053" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True"/>
         </Button>
-        <Button FocusVisualStyle="{x:Null}"  Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoBottom" Margin="-1,518,0,-1" Width="50" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" Height="41" VerticalAlignment="Bottom">
+        <Button Focusable="False"  Visibility="Collapsed" Click="StartLogo_Click" x:Name="StartLogoBottom" Margin="-1,518,0,-1" Width="50" HorizontalAlignment="Left" Background="#180053" BorderBrush="{x:Null}" Height="41" VerticalAlignment="Bottom">
             <Image IsHitTestVisible="False" Source="/Resources/start2.png" Width="28" Height="41" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality"  SnapsToDevicePixels="True" Margin="0,0,0,0"/>
         </Button>
     </Grid>

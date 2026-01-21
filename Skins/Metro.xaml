@@ -86,7 +86,7 @@
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background">
                     <Setter.Value>
-                        <SolidColorBrush Color="LightGray" Opacity="0.1"></SolidColorBrush>
+                        <SolidColorBrush Color="White" Opacity="0.3"></SolidColorBrush>
                     </Setter.Value>
                 </Setter>
             </Trigger>
@@ -470,80 +470,6 @@
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"></Setter>
         <Setter Property="Foreground" Value="White" />
     </Style>
-    <Style x:Key="FallbackTile" TargetType="local:TileControl">
-        <Setter Property="Background" >
-            <Setter.Value>
-                <LinearGradientBrush EndPoint="1,0" StartPoint="0,0">
-                    <GradientStop Color="#706D6D" Offset="1"/>
-                    <GradientStop Color="#585956" Offset="0"/>
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="CountFontSize" Value="28" />
-        <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="#FF767676" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Height" Value="140" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="Margin" Value="3" />
-        <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="local:TileControl">
-                    <Grid>
-                        <Border x:Name="PART_Border"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-                            <Grid>
-                                <StackPanel HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        Orientation="Horizontal">
-                                    <ContentPresenter RecognizesAccessKey="True" />
-                                    <Image Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" Margin="0,2,0,26" VerticalAlignment="Center" HorizontalAlignment="Center" Width="48" Height="48"/>
-                                    <TextBlock VerticalAlignment="Center" Margin="-2,0,0,1"
-                                           FontSize="{TemplateBinding CountFontSize}"
-                                           Text="{TemplateBinding Count}" />
-                                </StackPanel>
-                                <TextBlock Margin="14,0,0,4"
-                                            FontSize="12"
-                                            
-                                            FontFamily="Segoe UI"
-                                            HorizontalAlignment="{TemplateBinding HorizontalTitleAlignment}"
-                                            VerticalAlignment="{TemplateBinding VerticalTitleAlignment}"
-                                            Foreground="{TemplateBinding Foreground}"
-                                            Text="{TemplateBinding Title}"
-                                            TextWrapping="Wrap" />
-                            </Grid>
-                        </Border>
-                        <Border x:Name="PART_HoverBorder"
-                            BorderBrush="Black"
-                            BorderThickness="2"
-                            Opacity="0"
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                       
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="Button.IsPressed" Value="True">
-                            <Setter Property="RenderTransform">
-                                <Setter.Value>
-                                    <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="0.98" ScaleY="0.98" />
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value=".55" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="TitleFontSize" Value="16" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Width" Value="140" />
-        <Setter Property="local:ControlHelper.MouseOverBorderBrush" Value="{x:Null}" />
-    </Style>
     <Style TargetType="{x:Type MenuItem}">
         <Setter Property="Template">
             <Setter.Value>
@@ -621,22 +547,27 @@
         </Setter>
     </Style>
 
-
     <Style x:Key="TilesHostForAero" TargetType="{x:Type ItemsControl}">
         <Setter Property="Margin" Value="0,3,0,0"></Setter>
     </Style>
+	
+	<Style x:Key="TileHoverEffect" TargetType="Border">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush">
+                    <Setter.Value>
+                        <SolidColorBrush Color="White" Opacity="0.242"></SolidColorBrush>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="False">
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+	
     <Style x:Key="ColoredTile" TargetType="local:TileControl">
         <Style.Resources>
-			<Style TargetType="Border" x:Key="HoverBorderStyle">
-				<Setter Property="BorderThickness" Value="0"/>
-				<Setter Property="BorderBrush" Value="White"/>
-				<Setter Property="Background" Value="Transparent"/>
-				<Style.Triggers>
-					<Trigger Property="IsMouseOver" Value="True">
-						<Setter Property="BorderThickness" Value="2"/>
-					</Trigger>
-				</Style.Triggers>
-			</Style>
             <local:FileToIconConverter x:Key="fic" />
         </Style.Resources>
         <Setter Property="Background" >
@@ -647,17 +578,24 @@
                 </LinearGradientBrush>
             </Setter.Value>
         </Setter>
+		
         <Setter Property="CountFontSize" Value="28" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderBrush" Value="{Binding Border}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Height" Value="140" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="Margin" Value="3" />
+        <Setter Property="Margin" Value="0" />
         <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:TileControl">
+				<Border x:Name="SudoBorder" RenderTransformOrigin="0.5,0.5" Margin="0,2,2,0" BorderThickness="3" Style="{DynamicResource TileHoverEffect}" Focusable="False" VerticalAlignment="Top" HorizontalAlignment="Left">
+				 <Border.RenderTransform>
+                        <ScaleTransform x:Name="Scale"
+                                        ScaleX="1"
+                                        ScaleY="1"/>
+                    </Border.RenderTransform>
                     <Grid x:Name="RootGrid">
                         <Border x:Name="Background"
                             Background="{TemplateBinding Background}"
@@ -668,14 +606,7 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Opacity="0.4"
                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-                        </Border>
-                        <Border x:Name="PART_HoverBorder"
-                            BorderBrush="Black"
-                            BorderThickness="2"
-                            Opacity="0"
-							Style="{StaticResource HoverBorderStyle}"
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-							
+                        </Border>							
                         <Grid>
                             <StackPanel HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -701,14 +632,52 @@
                                             TextWrapping="Wrap" />
                         </Grid>
                     </Grid>
+									</Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="Button.IsPressed" Value="True">
-                            <Setter Property="RenderTransform">
-                                <Setter.Value>
-                                    <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="0.97" ScaleY="0.97" />
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
+					 <Trigger Property="IsPressed" Value="True">
+						<Trigger.EnterActions>
+							<BeginStoryboard>
+								<Storyboard>
+
+									<DoubleAnimation Storyboard.TargetName="Scale"
+													 Storyboard.TargetProperty="ScaleX"
+													 To="0.97"
+													 Duration="0:0:0.06"/>
+
+									<DoubleAnimation Storyboard.TargetName="Scale"
+													 Storyboard.TargetProperty="ScaleY"
+													 To="0.97"
+													 Duration="0:0:0.06"/>
+
+								</Storyboard>
+							</BeginStoryboard>
+						</Trigger.EnterActions>
+
+							<!-- Animacja puszczenia taka narazie, potem trzeba dodać tilt -->
+						<Trigger.ExitActions>
+								<BeginStoryboard>
+									<Storyboard>
+
+										<DoubleAnimation Storyboard.TargetName="Scale"
+														 Storyboard.TargetProperty="ScaleX"
+														 To="1"
+														 Duration="0:0:0.03">
+											<DoubleAnimation.EasingFunction>
+												<QuinticEase/>
+											</DoubleAnimation.EasingFunction>
+										</DoubleAnimation>
+
+										<DoubleAnimation Storyboard.TargetName="Scale"
+														 Storyboard.TargetProperty="ScaleY"
+														 To="1"
+														 Duration="0:0:0.03"/>
+
+									</Storyboard>
+								</BeginStoryboard>
+							</Trigger.ExitActions>
+						</Trigger>
+					
+				
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value=".55" />
                         </Trigger>
@@ -735,7 +704,7 @@
                             <Setter TargetName="RootGrid" Property="Height" Value="120"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
-                </ControlTemplate>
+					</ControlTemplate>
             </Setter.Value>
         </Setter>
         <Setter Property="TitleFontSize" Value="16" />

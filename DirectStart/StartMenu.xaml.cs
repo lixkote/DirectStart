@@ -1483,7 +1483,6 @@ namespace B8TAM
                 e.Handled = true;
             }
         }
-
     }
 
     public class RunCommand : ICommand
