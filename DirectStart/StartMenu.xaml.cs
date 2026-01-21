@@ -613,53 +613,51 @@ namespace B8TAM
 
         public void OnStartTriggered(object sender, EventArgs e)
         {
-            ToggleStartMenu();
+            OnStartTriggeredNoArgs();
         }
-
         public void OnStartTriggeredNoArgs()
         {
             ToggleStartMenu();
         }
 
-        public async void ToggleStartMenu()
+        private void Menu_Deactivated(object sender, EventArgs e)
         {
-            try
-            {
-                if (Visibility == Visibility.Visible)
-                {
-                    Hide();
-                }
-                else
-                {
-                    AdjustToTaskbarReworked();
-                    DUIColorize();
-                    // SearchText.Focus();
-                    Show();
-                    this.Activate(); 
-                    this.Focus();    
-                }
-            }
-            catch (Exception ex)
-            {
-				Debug.WriteLine(ex.ToString());
-            }
+            if (IsVisible)
+                HideMenu();
         }
 
 
-        private void Window_Activated(object sender, EventArgs e)
-		{
-			Screen screen = Screen.FromPoint(System.Windows.Forms.Control.MousePosition);
-			this.Left = screen.WorkingArea.Left;
-            if (IsDwmBlurEnabled.Text == "False" || IsDwmBlurEnabled.Text == "false")
-			{
-				// Do not enable blur
-			}
-			else if (IsDwmBlurEnabled.Text == "True" || IsDwmBlurEnabled.Text == "true")
-			{
-				// Enable blur
-				DWMBlurEffect.EnableBlur(this);
+        // Improved toggle logic with a "dirty" flicker fix, but if it works, it works i guess lmao
+
+        private DateTime _lastHideTime;
+        private const int HideCooldownMs = 100;
+
+        private void HideMenu()
+        {
+            _lastHideTime = DateTime.UtcNow;
+
+            Results.Clear();
+            SearchText.Text = string.Empty;
+
+            Hide();
+        }
+
+
+        public void ToggleStartMenu()
+        {
+            if ((DateTime.UtcNow - _lastHideTime).TotalMilliseconds < HideCooldownMs)
+                return;
+            if (IsVisible)
+            {
+                HideMenu();
+                return;
             }
-		}
+            DUIColorize();
+            AdjustToTaskbarReworked();
+            Show();
+            Activate();
+            Focus();
+        }
 
         private void HandleCheck(object sender, RoutedEventArgs e)
 		{
@@ -680,14 +678,6 @@ namespace B8TAM
             ToggleButtonGlyph.Text = "";
             ToggleButtonGlyph.FontFamily = new System.Windows.Media.FontFamily("Segoe UI Symbol");
         }
-
-		private void Menu_Deactivated(object sender, EventArgs e)
-		{
-			Results.Clear();
-			SearchText.Text = string.Empty;
-			Visibility = Visibility.Hidden;
-			Hide();
-		}
 
         // Method to load Metro apps into the Programs list
         private void LoadMetroApps(string metroAppsDirectory)
