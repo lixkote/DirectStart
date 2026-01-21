@@ -35,7 +35,7 @@ using System.Xml.Serialization;
 using static B8TAM.TilesLoader;
 using Color = System.Windows.Media.Color;
 using File = System.IO.File;
-
+using MessageBox = System.Windows.MessageBox;
 
 namespace B8TAM
 {
@@ -635,11 +635,11 @@ namespace B8TAM
         private void HideMenu()
         {
             _lastHideTime = DateTime.UtcNow;
-
             Results.Clear();
             SearchText.Text = string.Empty;
 
             Hide();
+            CloseProgramslist();
         }
 
 
@@ -671,8 +671,13 @@ namespace B8TAM
 
 		private void HandleUnchecked(object sender, RoutedEventArgs e)
 		{
-			GridPrograms.Visibility = Visibility.Collapsed;
-			GridTogglable.Visibility = Visibility.Visible;
+            CloseProgramslist();
+        }
+
+        private void CloseProgramslist()
+        {
+            GridPrograms.Visibility = Visibility.Collapsed;
+            GridTogglable.Visibility = Visibility.Visible;
             ToggleButtonText.Visibility = Visibility.Visible;
             ToggleButtonTextBack.Visibility = Visibility.Collapsed;
             ToggleButtonGlyph.Text = "";
@@ -809,7 +814,14 @@ namespace B8TAM
 		{
 			StartMenuLink data = (sender as FrameworkElement).DataContext as StartMenuLink;
 			this.Hide();
-			Process.Start(data.Link);
+            try
+            {
+                Process.Start(data.Link);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "This app couldn't be started", MessageBoxButton.OK);
+            }
 		}
 
 		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
