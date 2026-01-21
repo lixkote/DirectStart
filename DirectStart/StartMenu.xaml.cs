@@ -829,8 +829,15 @@ namespace B8TAM
 		{
 			Tile data = (sender as FrameworkElement).DataContext as Tile;
 			this.Hide();
-			Process.Start(data.Path);
-		}
+            try
+            {
+                Process.Start(data.Path);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "This app couldn't be started", MessageBoxButton.OK);
+            }
+        }
 
 		private void BrowseLink_Click(object sender, RoutedEventArgs e)
 		{
