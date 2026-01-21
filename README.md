@@ -5,19 +5,16 @@
 
 # DirectStart
 
-## This project aims to recreate the unreleased Start Menu update for Windows 8.1
-
-
-**Note: This is not a real reimplementation, just a recreation using C# WPF.**
+## Making the scrapped start menu update real! 
 
 Supported operating systems:
 
-- Windows 10 and 11 **en-US english** all builds (Some features might not be available)
 - Windows 8.1 **en-US english** build 9600
-- Windows 7 and Vista **en-US english** (With latest free Extended Kernel) (Start Menu background color broken)
+  
+Might also run on, but unsupported **(Please do not report issues if ran on these OSes)**:
 
-**Please do not use this software on any mission critical systems, its purpose is experimental!**
-
+- Windows 10 and 11 **en-US english** all builds (Some features might not be available or broken)
+  
 ## Screenshots:
 
 ![DirectStart on 8.1 Screenshot](https://github.com/Lixkote/B8taMenu/blob/main/preview2.png)
