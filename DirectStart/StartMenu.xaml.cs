@@ -487,6 +487,19 @@ namespace B8TAM
             return SmartCapitalizeFirstLetter(Path.GetFileName(exePath));
         }
 
+        private string GetExeName(string path)
+        {
+            try
+            {
+                return System.IO.Path.GetFileNameWithoutExtension(path);
+            }
+            catch
+            {
+                return path;
+            }
+        }
+
+
         private void GetFrequentsNew()
         {
         if (startfrequent > maxfrequent)
@@ -511,46 +524,55 @@ namespace B8TAM
                     sortedEntries.Add(entry);
                 }
             }
-
-            // Sortowanie wg liczby uruchomień
             sortedEntries.Sort((a, b) => b.ExecutionCount.CompareTo(a.ExecutionCount));
 
-            foreach (CountEntry entry in sortedEntries)
-            {
-                if (startfrequent >= maxfrequent)
-                    break;
-
-                string title = GetFrequentEntryName(entry.DecodedName);
-
-                if (string.IsNullOrWhiteSpace(title))
-                    continue;
-
-                string[] TSCNoFlyList =
+                foreach (CountEntry entry in sortedEntries)
                 {
-                    "Secondsystem",
-                    "Version Reporter Applet",
-                    "Control Panel",
-                    "DirectStart",
-                    "Start menu"
-                };
+                    if (startfrequent >= maxfrequent)
+                        break;
 
-                if (TSCNoFlyList.Any(b =>
-                    title.IndexOf(b, StringComparison.OrdinalIgnoreCase) >= 0))
-                {
-                    continue;
+                    string title = GetFrequentEntryName(entry.DecodedName);
+
+                    if (string.IsNullOrWhiteSpace(title))
+                        continue;
+
+                    if (title.Equals("Command Processor", StringComparison.OrdinalIgnoreCase))
+                    {
+                        title = "Command Prompt";
+                    }
+
+                    if (title.Length > 30)
+                    {
+                        title = GetExeName(entry.DecodedName);
+                    }
+
+                    string[] TSCNoFlyList =
+                    {
+                        "Secondsystem",
+                        "Version Reporter Applet",
+                        "CompMgmtLauncher",
+                        "Control Panel",
+                        "DirectStart",
+                        "Start menu"
+                    };
+
+                    if (TSCNoFlyList.Any(b =>
+                        title.IndexOf(b, StringComparison.OrdinalIgnoreCase) >= 0))
+                    {
+                        continue;
+                    }
+
+                    Recent.Add(new StartMenuLink
+                    {
+                        Title = title,
+                        Icon = IconHelper.GetFileIcon(entry.DecodedName),
+                        Link = entry.DecodedName
+                    });
+
+                    startfrequent++;
                 }
-
-                Recent.Add(new StartMenuLink
-                {
-                    Title = title,
-                    Icon = IconHelper.GetFileIcon(entry.DecodedName),
-                    Link = entry.DecodedName
-                });
-
-                startfrequent++;
             }
-        }
-        catch (Exception ex)
+            catch (Exception ex)
         {
             System.Windows.MessageBox.Show("Error reading UserAssist entries: " + ex.Message);
         }
