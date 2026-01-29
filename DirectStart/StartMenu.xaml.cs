@@ -68,6 +68,9 @@ namespace B8TAM
 
         public const int WH_START_TRIGGERED = 0x8001;
 
+        [DllImport("user32.dll")]
+        private static extern bool LockWorkStation();
+
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -526,29 +529,31 @@ namespace B8TAM
 
         private void GetFrequentsNew()
         {
-        if (startfrequent > maxfrequent)
-            return;
+            if (startfrequent > maxfrequent)
+                return;
 
-        try
-        {
-            RegistryKey reg = Registry.CurrentUser.OpenSubKey(SelectedSourceType.Key);
-            List<CountEntry> sortedEntries = new List<CountEntry>();
-
-            foreach (string valueName in reg.GetValueNames())
+            try
             {
-                CountEntry entry = new CountEntry
-                {
-                    Name = valueName,
-                    Value = (byte[])reg.GetValue(valueName),
-                    RegKey = reg.ToString()
-                };
+                RegistryKey reg = Registry.CurrentUser.OpenSubKey(SelectedSourceType.Key);
+                List<CountEntry> sortedEntries = new List<CountEntry>();
+                HashSet<string> addedTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                if (File.Exists(entry.DecodedName) || Directory.Exists(entry.DecodedName))
+                foreach (string valueName in reg.GetValueNames())
                 {
-                    sortedEntries.Add(entry);
+                    CountEntry entry = new CountEntry
+                    {
+                        Name = valueName,
+                        Value = (byte[])reg.GetValue(valueName),
+                        RegKey = reg.ToString()
+                    };
+
+                    if (File.Exists(entry.DecodedName) || Directory.Exists(entry.DecodedName))
+                    {
+                        sortedEntries.Add(entry);
+                    }
                 }
-            }
-            sortedEntries.Sort((a, b) => b.ExecutionCount.CompareTo(a.ExecutionCount));
+
+                sortedEntries.Sort((a, b) => b.ExecutionCount.CompareTo(a.ExecutionCount));
 
                 foreach (CountEntry entry in sortedEntries)
                 {
@@ -561,32 +566,44 @@ namespace B8TAM
                         continue;
 
                     if (title.Equals("Command Processor", StringComparison.OrdinalIgnoreCase))
-                    {
                         title = "Command Prompt";
-                    }
+
+                    if (title.Equals("Diskmgmt", StringComparison.OrdinalIgnoreCase))
+                        title = "Disk Management";
+
+                    if (title.Equals("ResourceHacker", StringComparison.OrdinalIgnoreCase))
+                        title = "Resource Hacker";
+
+                    if (title.Equals("Explorer", StringComparison.OrdinalIgnoreCase))
+                        title = "File Explorer";
 
                     if (title.Length > 30)
-                    {
                         title = GetExeName(entry.DecodedName);
-                    }
 
                     string[] TSCNoFlyList =
                     {
-                        "Secondsystem",
-                        "Version Reporter Applet",
-                        "CompMgmtLauncher",
-                        "Control Panel",
-                        "DirectStart",
-                        "Start Menu",
-                        "StartMenu",
-                        "Start menu"
-                    };
+                "Secondsystem",
+                "Version Reporter Applet",
+                "CompMgmtLauncher",
+                "Control Panel",
+                "DirectStart",
+                "Start Menu",
+                "ColorSync",
+                "Setup",
+                "Installer",
+                "installation",
+                "MMixConfig",
+                "Notifications",
+                "StartMenu",
+                "Start menu"
+            };
 
                     if (TSCNoFlyList.Any(b =>
                         title.IndexOf(b, StringComparison.OrdinalIgnoreCase) >= 0))
-                    {
                         continue;
-                    }
+
+                    if (!addedTitles.Add(title))
+                        continue;
 
                     Recent.Add(new StartMenuLink
                     {
@@ -599,13 +616,14 @@ namespace B8TAM
                 }
             }
             catch (Exception ex)
-        {
-            System.Windows.MessageBox.Show("Error reading UserAssist entries: " + ex.Message);
+            {
+                System.Windows.MessageBox.Show("Error reading UserAssist entries: " + ex.Message);
+            }
         }
-    }
 
 
-		private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+
+        private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			e.Handled = false;
 		}
@@ -723,6 +741,7 @@ namespace B8TAM
             ForceForegroundWindow(hwnd);
             this.Show();
             this.Focus();
+            ProgramsList.Focus();
         }
 
         private void HandleCheck(object sender, RoutedEventArgs e)
@@ -1245,32 +1264,25 @@ namespace B8TAM
             }
         }
 
+        private void OpenUserAccountSettings()
+        {
+            string path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                @"Packages\windows.immersivecontrolpanel_cw5n1h2txyewy\LocalState\Indexed\Settings\en-US\AAA_SettingsPageAccountsPicture.settingcontent-ms"
+            );
+
+            Process.Start("explorer.exe", path);
+        }
+
+
         private void UserImageChangeMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //Explorer.exe shell:AppsFolder\Windows.ImmersiveControlPanel_cw5n1h2txyewy!microsoft.windows.immersivecontrolpanel
+            OpenUserAccountSettings();
         }
 
         private void LockMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // Define some constants
-            const int KEYEVENTF_EXTENDEDKEY = 0x1;
-            const int KEYEVENTF_KEYUP = 0x2;
-
-            // Get the virtual key codes for Windows and L keys
-            byte winKey = (byte)KeyInterop.VirtualKeyFromKey(Key.LWin);
-            byte lKey = (byte)KeyInterop.VirtualKeyFromKey(Key.L);
-
-            // Press the Windows key
-            keybd_event(winKey, MapVirtualKey(winKey, 0), KEYEVENTF_EXTENDEDKEY, 0);
-
-            // Press the L key
-            keybd_event(lKey, MapVirtualKey(lKey, 0), KEYEVENTF_EXTENDEDKEY, 0);
-
-            // Release the L key
-            keybd_event(lKey, MapVirtualKey(lKey, 0), KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-
-            // Release the Windows key
-            keybd_event(winKey, MapVirtualKey(winKey, 0), KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+            LockWorkStation();
         }
 
         const uint EWX_LOGOFF = 0x00000000;

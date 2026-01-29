@@ -131,7 +131,7 @@
                 <Grid>
                     <Grid x:Name="GridPrograms" Margin="0,0,0,81" >
                         <ScrollViewer Focusable="False" x:Name="ProgramsListScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="0" Grid.Column="1" Margin="5,0,0,0">
-                            <ItemsControl Focusable="False" x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
+                            <ItemsControl FocusVisualStyle="{x:Null}" x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
                                 <ItemsControl.Resources>
                                     <DataTemplate x:Name="listViewData" DataType="{x:Type local:StartMenuLink}">
                                         <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">                                            
