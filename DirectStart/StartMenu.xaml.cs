@@ -188,7 +188,14 @@ namespace B8TAM
                     .OrderBy(x => DefaultPinnedOrder.ContainsKey(x.Title) ? DefaultPinnedOrder[x.Title] : int.MaxValue)
             );
 
-			InitializeComponent();
+
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex) { System.Windows.MessageBox.Show(ex.ToString() + "Make sure you have the skins folder aside the main DirectStart exe", "We couldn't load the start menu."); }
+
+
 
 			UserImageButton.Tag = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 			userpfp.Source = IconHelper.GetUserTile(Environment.UserName).ToBitmapImage();
@@ -196,18 +203,22 @@ namespace B8TAM
 			ProgramsList.ItemsSource = Programs;
 			RecentApps.ItemsSource = Recent;
 
-            // CollectionView startListView = (CollectionView)CollectionViewSource.GetDefaultView(ProgramsList.ItemsSource);
             PropertyGroupDescription startGroupDesc = new PropertyGroupDescription("Alph");
-            // startListView.GroupDescriptions.Add(startGroupDesc);
+            SearchGlyph.Source = Properties.Resources.searchglyph.ToBitmapImage();
 
-                SearchGlyph.Source = Properties.Resources.searchglyph.ToBitmapImage();
-            // PowerGlyph.Source = Properties.Resources.powerglyph.ToBitmapImage();
-
-            // Get the god damn username from WMI
+            // Try to get the username from WMI, will return the proper username if the user changed it in cpl
             var searcher = new ManagementObjectSearcher("SELECT FullName FROM Win32_UserAccount WHERE Name='" + Environment.UserName + "'");
             foreach (ManagementObject obj in searcher.Get())
             {
-                UserNameText.Text = obj["FullName"]?.ToString();
+                if (obj["FullName"]?.ToString() != null || obj["FullName"]?.ToString() != "")
+                {
+                    UserNameText.Text = obj["FullName"]?.ToString();
+                }
+                else
+                {
+                    // WMI Username was empty, so falling back to classic method of getting username from directstart 2.x
+                    UserNameText.Text = Environment.UserName;
+                }
             }
 
             DUIColorize();
@@ -969,8 +980,28 @@ namespace B8TAM
                 MessageBox.Show(ex.ToString(), "This app couldn't be started", MessageBoxButton.OK);
             }
 		}
+        private void LinkRunAsAdmin(object sender, MouseButtonEventArgs e)
+        {
+            StartMenuLink data = (sender as FrameworkElement).DataContext as StartMenuLink;
+            this.Hide();
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = data.Link,
+                    UseShellExecute = true,
+                    Verb = "runas"
+                };
 
-		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "This app couldn't be started", MessageBoxButton.OK);
+            }
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			var searchTerm = SearchText.Text;
 			Search(searchTerm);
@@ -1353,13 +1384,14 @@ namespace B8TAM
                 {
                     FileName = tile.Path,
                     UseShellExecute = true,
-                    Verb = "runas" // This requests elevation
+                    Verb = "runas" 
                 };
 
                 Process.Start(startInfo);
             }
             catch (System.ComponentModel.Win32Exception ex)
             {
+                MessageBox.Show(ex.ToString(), "This tile couldn't be launched", MessageBoxButton.OK);
             }
         }
         private void OpenFileLocationTile_Click(object sender, RoutedEventArgs e)
@@ -1421,7 +1453,7 @@ namespace B8TAM
                     new XElement("PathMetro", ""), // Optional for Metro links
                     new XElement("Size", "Normal"),
                     new XElement("IsLiveTileEnabled", "false"),
-                    new XElement("TileColor", "default") // or generate dynamically
+                    new XElement("TileColor", "default") // generate dynamically
                 );
 
                 doc.Root.Add(newTile);
@@ -1466,6 +1498,90 @@ namespace B8TAM
                 StartMenuBackground.Width = 533;
             }
         }
+        private void pinstart_Click_fromuserassistlist(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as System.Windows.Controls.MenuItem;
+            var link = menuItem?.DataContext as StartMenuLink;
+            if (link == null || string.IsNullOrWhiteSpace(link.Link)) return;
+
+            string configFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "PinnedTilesDS.xml");
+
+            try
+            {
+                XDocument doc;
+
+                // Load or initialize XML
+                if (File.Exists(configFile))
+                {
+                    doc = XDocument.Load(configFile);
+                }
+                else
+                {
+                    doc = new XDocument(new XElement("Tiles"));
+                }
+
+                // Check if already pinned
+                var alreadyPinned = doc.Descendants("Tile")
+                    .Any(x => x.Element("Path")?.Value == link.Link);
+
+                if (alreadyPinned)
+                {
+                    Debug.WriteLine($"(pinstart_Click) Tile already pinned: {link.Title}");
+                    return;
+                }
+
+                // Create new <Tile> element
+                XElement newTile = new XElement("Tile",
+                    new XElement("Path", link.Link),
+                    new XElement("PathMetro", ""), // Optional for Metro links
+                    new XElement("Size", "Normal"),
+                    new XElement("IsLiveTileEnabled", "false"),
+                    new XElement("TileColor", "default") // generate dynamically
+                );
+
+                doc.Root.Add(newTile);
+                doc.Save(configFile);
+
+                // Build Tile object to display immediately
+                Tile pinnedTile = new Tile
+                {
+                    Title = System.IO.Path.GetFileNameWithoutExtension(link.Link),
+                    Path = link.Link,
+                    EXEPath = GetShortcutTarget(link.Link),
+                    PathMetro = "",
+                    Size = "Normal",
+                    Icon = IconHelper.GetFileIcon(link.Link),
+                    IsLiveTileEnabled = false,
+                    LeftGradient = TileColorCalculator.CalculateLeftGradient(
+                        IconHelper.GetLargeFileIcon(link.Link),
+                        link.Title, "default"),
+                    RightGradient = TileColorCalculator.CalculateRightGradient(
+                        IconHelper.GetLargeFileIcon(link.Link),
+                        link.Title, "default"),
+                    Border = TileColorCalculator.CalculateBorder(
+                        IconHelper.GetLargeFileIcon(link.Link),
+                        link.Title, "default")
+                };
+
+                // Add to tiles list and refresh UI
+                Tiles.Add(pinnedTile);
+                TilesHost.ItemsSource = null;
+                TilesHost.ItemsSource = Tiles;
+
+                Debug.WriteLine($"(pinstart_Click) Pinned new tile: {pinnedTile.Title}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"(pinstart_Click) Error pinning tile: {ex.Message}");
+            }
+            if (TilesHost.Items.Count > 0)
+            {
+                Debug.WriteLine("(StartMenu.xaml.cs) A tile was pinned. Unhiding tiles section.");
+                Menu.Width = 533;
+                StartMenuBackground.Width = 533;
+            }
+        }
+
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
@@ -1494,6 +1610,11 @@ namespace B8TAM
                 OnStartTriggered(sender, e);
                 e.Handled = true;
             }
+        }
+
+        private void runasadmin_Click(object sender, RoutedEventArgs e)
+        {
+            LinkRunAsAdmin(sender, null);
         }
     }
 

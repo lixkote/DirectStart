@@ -100,7 +100,7 @@
             <TextBlock Style="{StaticResource IsSkinSupportDuiBackgroundColor}" x:Name="IsSkinSupportDuiBackgroundColor" Visibility="Collapsed"></TextBlock>
             <TextBlock Style="{StaticResource IsSkinSupportDwmBlur}" x:Name="IsDwmBlurEnabled" Visibility="Collapsed"></TextBlock>
             <Border x:Name="BackgroundBorder" BorderThickness="0,1,1,1" Margin="0,0,5,0" Grid.ColumnSpan="2"/>
-            <ItemsControl FocusVisualStyle="{x:Null}" dd:DragDrop.IsDropTarget="True" dd:DragDrop.UseVisualSourceItemSizeForDragAdorner="True" dd:DragDrop.IsDragSource="True" x:Name="TilesHost" Grid.Column="1" Margin="0,3,0,0">
+            <ItemsControl Focusable="False" dd:DragDrop.IsDropTarget="True" dd:DragDrop.UseVisualSourceItemSizeForDragAdorner="True" dd:DragDrop.IsDragSource="True" x:Name="TilesHost" Grid.Column="1" Margin="0,3,0,0">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel VerticalAlignment="Top"/>
@@ -131,7 +131,7 @@
                 <Grid>
                     <Grid x:Name="GridPrograms" Margin="0,0,0,81" >
                         <ScrollViewer Focusable="False" x:Name="ProgramsListScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="0" Grid.Column="1" Margin="5,0,0,0">
-                            <ItemsControl FocusVisualStyle="{x:Null}" x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
+                            <ItemsControl Focusable="False" x:Name="ProgramsList" HorizontalContentAlignment="Stretch" BorderThickness="0" ItemsSource="{Binding Programs}" Background="Transparent" >
                                 <ItemsControl.Resources>
                                     <DataTemplate x:Name="listViewData" DataType="{x:Type local:StartMenuLink}">
                                         <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">                                            
@@ -140,6 +140,7 @@
                                                     <MenuItem x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
                                                     <MenuItem Header="Open" Click="Link_Click"/>
                                                     <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
+                                                    <MenuItem Click="runasadmin_Click" x:Name="runasadmin" Header="Run as administrator"></MenuItem>
                                                 </ContextMenu>
                                             </StackPanel.ContextMenu>
                                             <ToggleButton FocusVisualStyle="{DynamicResource SimpleHighlightFocusVisual}" Click="Link_Click" x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
@@ -195,9 +196,10 @@
                                         <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">
                                             <StackPanel.ContextMenu>
                                                 <ContextMenu>
- 
+                                                    <MenuItem x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
                                                     <MenuItem Header="Open" Click="Link_Click"/>
                                                     <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
+                                                    <MenuItem Click="runasadmin_Click" x:Name="runasadmin" Header="Run as administrator"></MenuItem>
                                                 </ContextMenu>
                                             </StackPanel.ContextMenu>
                                             <ToggleButton FocusVisualStyle="{DynamicResource SimpleHighlightFocusVisual}" Click="Link_Click" x:Name="collapse" IsChecked="False" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch">
@@ -273,6 +275,7 @@
                                                 <MenuItem x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
                                                 <MenuItem Header="Open" Click="Link_Click"/>
                                                 <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
+                                                <MenuItem Click="runasadmin_Click" x:Name="runasadmin" Header="Run as administrator"></MenuItem>
                                             </ContextMenu>
                                         </StackPanel.ContextMenu>
                                         <Image Source="{Binding Icon}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="32" Height="32" Margin="0,0,5,0"/>
@@ -325,12 +328,14 @@
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.Resources>
-                                <DataTemplate x:Name="listViewDataPinnedR" DataType="{x:Type local:StartMenuLink}">
+                                <DataTemplate x:Name="listViewRecent" DataType="{x:Type local:StartMenuLink}">
                                     <StackPanel Orientation="Horizontal" Height="40" MouseEnter="Item_MouseEnter" MouseLeave="Item_MouseLeave" OverridesDefaultStyle="False" MouseLeftButtonUp="Link_Click" Margin="0">
                                         <StackPanel.ContextMenu>
                                             <ContextMenu>
+                                                <MenuItem x:Name="pinstart" Visibility="Collapsed" Header="Pin to the start menu" Click="pinstart_Click_fromuserassistlist"/>
                                                 <MenuItem Header="Open" Click="Link_Click"/>
                                                 <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
+                                                <MenuItem Click="runasadmin_Click" x:Name="runasadmin" Header="Run as administrator"></MenuItem>
                                             </ContextMenu>
                                         </StackPanel.ContextMenu>
                                         <Image Source="{Binding Icon}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="32" Height="32" Margin="0,0,5,0"/>

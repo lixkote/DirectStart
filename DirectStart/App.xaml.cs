@@ -35,6 +35,30 @@ namespace AFSM
             }
         }
 
+        private void KillDS()
+        {
+            try
+            {
+                // Get all processes named "StartMenu.exe"
+                var processes = Process.GetProcessesByName("StartMenu");
+
+                if (processes.Length == 0)
+                {
+                    return;
+                }
+
+                // Kill each found process
+                foreach (var process in processes)
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
         protected override void OnStartup(StartupEventArgs e)
         {
             RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\DirectStart");
@@ -70,11 +94,12 @@ namespace AFSM
                     else
                     {
                         System.Windows.MessageBox.Show(
-                            "The " + theme + " theme does not exist in the 'Skins' folder next to the executable.\n" +
-                            "Check if '" + theme + ".xaml' is present.",
-                            "DirectStart",
+                            "The specified " + theme + " theme does not exist in the 'Skins' folder next to the executable.\n" +
+                            "Check if '" + theme + ".xaml' is present in the 'Skins' folder.",
+                            "We couldn't launch DirectStart",
                             MessageBoxButton.OK,
                             MessageBoxImage.Error);
+                        KillDS();
                     }
 
                     this.Resources["RoundedUserProfileShape"] = roundUserProfile;
@@ -90,13 +115,15 @@ namespace AFSM
                     ApplyDefaultSettings();
                 }
             }
-            catch
-            {
+            catch (Exception ex) {
+                // There probably are some shitty leftovers from previous DS versions, nuke and rebuild the key:
+                Debug.WriteLine("(App.xaml.cs) Found broken registry settings that caused an startup error: " + ex.ToString());
+                Debug.WriteLine("(App.xaml.cs) Nuking the DirectStart key and applying default settings");
+                Registry.CurrentUser.DeleteSubKeyTree(@"SOFTWARE\DirectStart", false);
                 ApplyDefaultSettings();
             }
 
             SetLanguageDictionary();
-            // key.Close();
             StartMenu mainWindow = new StartMenu();
             mainWindow.Show();
         }
@@ -108,32 +135,35 @@ namespace AFSM
             {
                 if (key != null)
                 {
-                    // Load default values
-                    SetRegistryDefaultDword(key, "Force10BetaStartButton", 0);
-                    SetRegistryDefaultDword(key, "RetroBarFix", 0);
-                    SetRegistryDefaultDword(key, "DisableTiles", 0);
-                    SetRegistryDefaultDword(key, "RoundedUserProfileShape", 1);
-                    SetRegistryDefaultDword(key, "EnableMetroAppsLoad", 0);
-                    SetRegistryDefaultDword(key, "UseLegacyMenuIntercept", 1);
-                    SetRegistryDefaultString(key, "Theme", "Metro");
 
-                    this.Resources["RoundedUserProfileShape"] = ((int?)key.GetValue("RoundedUserProfileShape") == 1);
-                    this.Resources["Force10BetaStartButton"] = ((int?)key.GetValue("Force10BetaStartButton") == 1);
-                    this.Resources["RetroBarFix"] = ((int?)key.GetValue("RetroBarFix") == 1);
-                    this.Resources["DisableTiles"] = ((int?)key.GetValue("DisableTiles") == 1);
-                    this.Resources["EnableMetroAppsLoad"] = ((int?)key.GetValue("DisableTiles") == 1);
-                    this.Resources["UseLegacyMenuIntercept"] = ((int?)key.GetValue("UseLegacyMenuIntercept") == 1);
+                        // Load default values
+                        SetRegistryDefaultDword(key, "Force10BetaStartButton", 0);
+                        SetRegistryDefaultDword(key, "RetroBarFix", 0);
+                        SetRegistryDefaultDword(key, "DisableTiles", 0);
+                        SetRegistryDefaultDword(key, "RoundedUserProfileShape", 1);
+                        SetRegistryDefaultDword(key, "EnableMetroAppsLoad", 0);
+                        SetRegistryDefaultDword(key, "UseLegacyMenuIntercept", 1);
+                        SetRegistryDefaultString(key, "Theme", "Metro");
 
-                    string theme = key.GetValue("Theme") as string;
-                    string resourceDictionaryPath = GetResourceDictionaryPath(theme);
-                    if (!string.IsNullOrEmpty(resourceDictionaryPath))
-                    {
-                        ResourceDictionary skinDictionary = new ResourceDictionary
+                        this.Resources["RoundedUserProfileShape"] = ((int?)key.GetValue("RoundedUserProfileShape") == 1);
+                        this.Resources["Force10BetaStartButton"] = ((int?)key.GetValue("Force10BetaStartButton") == 1);
+                        this.Resources["RetroBarFix"] = ((int?)key.GetValue("RetroBarFix") == 1);
+                        this.Resources["DisableTiles"] = ((int?)key.GetValue("DisableTiles") == 1);
+                        this.Resources["EnableMetroAppsLoad"] = ((int?)key.GetValue("DisableTiles") == 1);
+                        this.Resources["UseLegacyMenuIntercept"] = ((int?)key.GetValue("UseLegacyMenuIntercept") == 1);
+
+                        string theme = key.GetValue("Theme") as string;
+                        string resourceDictionaryPath = GetResourceDictionaryPath(theme);
+                        if (!string.IsNullOrEmpty(resourceDictionaryPath))
                         {
-                            Source = new Uri(resourceDictionaryPath, UriKind.RelativeOrAbsolute)
-                        };
-                        Resources.MergedDictionaries.Add(skinDictionary);
-                    }
+                            ResourceDictionary skinDictionary = new ResourceDictionary
+                            {
+                                Source = new Uri(resourceDictionaryPath, UriKind.RelativeOrAbsolute)
+                            };
+                            Resources.MergedDictionaries.Add(skinDictionary);
+                        }
+
+                    
                 }
             }
         }
