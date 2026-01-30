@@ -18,8 +18,6 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=.\license.txt
-; Uncomment the following line to run in non administrative install mode (install for current user only.)
-;PrivilegesRequired=lowest
 OutputDir=..\InstallerBin
 OutputBaseFilename=DirectStart3.0-installer
 SetupIconFile=.\install.ico
@@ -27,7 +25,7 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 WizardImageFile=.\WizardImage.bmp
-MinVersion=6.1sp1
+MinVersion=6.3
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
