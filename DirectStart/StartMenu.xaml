@@ -196,7 +196,7 @@
                                         <StackPanel Focusable="False" HorizontalAlignment="Stretch" Background="Transparent">
                                             <StackPanel.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
+                                                    <MenuItem Visibility="Collapsed" x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
                                                     <MenuItem Header="Open" Click="Link_Click"/>
                                                     <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
                                                     <MenuItem Click="runasadmin_Click" x:Name="runasadmin" Header="Run as administrator"></MenuItem>
@@ -272,7 +272,7 @@
                                     <StackPanel Orientation="Horizontal" Height="40" MouseEnter="Item_MouseEnter" MouseLeave="Item_MouseLeave" OverridesDefaultStyle="False" MouseLeftButtonUp="Link_Click">
                                         <StackPanel.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
+                                                <MenuItem Visibility="Collapsed" x:Name="pinstart" Header="Pin to the start menu" Click="pinstart_Click"/>
                                                 <MenuItem Header="Open" Click="Link_Click"/>
                                                 <MenuItem Header="Open file location..." Click="BrowseLink_Click"/>
                                                 <MenuItem Click="runasadmin_Click" x:Name="runasadmin" Header="Run as administrator"></MenuItem>

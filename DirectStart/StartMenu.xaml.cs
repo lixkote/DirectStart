@@ -210,14 +210,24 @@ namespace B8TAM
             var searcher = new ManagementObjectSearcher("SELECT FullName FROM Win32_UserAccount WHERE Name='" + Environment.UserName + "'");
             foreach (ManagementObject obj in searcher.Get())
             {
-                if (obj["FullName"]?.ToString() != null || obj["FullName"]?.ToString() != "")
-                {
-                    UserNameText.Text = obj["FullName"]?.ToString();
-                }
-                else
+                if (obj["FullName"]?.ToString() == null)
                 {
                     // WMI Username was empty, so falling back to classic method of getting username from directstart 2.x
                     UserNameText.Text = Environment.UserName;
+                }
+                else if (obj["FullName"]?.ToString() == "")
+                {
+                    // WMI Username was empty, so falling back to classic method of getting username from directstart 2.x
+                    UserNameText.Text = Environment.UserName;
+                }
+                else if (obj["FullName"]?.ToString() == " ")
+                {
+                    // WMI Username was empty, so falling back to classic method of getting username from directstart 2.x
+                    UserNameText.Text = Environment.UserName;
+                }
+                else
+                {
+                    UserNameText.Text = obj["FullName"]?.ToString();
                 }
             }
 

@@ -1,5 +1,5 @@
 #define MyAppName "DirectStart"
-#define MyAppVersion "3.0"
+#define MyAppVersion "3.0 for Windows 10"
 #define MyAppPublisher "Lixkote"
 #define MyAppURL "https://github.com/Lixkote/DirectStart"
 
@@ -18,23 +18,78 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=.\license.txt
-OutputDir=..\InstallerBin
-OutputBaseFilename=DirectStart3.0-installer
+ArchitecturesInstallIn64BitMode=x64
+OutputDir=..\InstallerOutput
+OutputBaseFilename=DirectStart3.0-installer-win10
 SetupIconFile=.\install.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 WizardImageFile=.\WizardImage.bmp
-MinVersion=6.3
+MinVersion=6.1sp1
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[Code]
+function IsWindhawkInstalled(): Boolean;
+begin
+  Result :=
+    FileExists(ExpandConstant('{autopf}\Windhawk\windhawk.exe')) or
+    FileExists(ExpandConstant('{pf}\Windhawk\windhawk.exe'));
+end;
+
+function InitializeSetup(): Boolean;
+var
+  UILang: Cardinal;
+begin
+  // Block Windows 8.1 only
+  if (GetWindowsVersion >= $06030000) and (GetWindowsVersion < $06040000) then
+  begin
+    MsgBox(
+      'Please use the appropriate version for Windows 8.1.'#13#10#13#10 +
+      'This version is for Windows 10 and other systems only!',
+      mbCriticalError,
+      MB_OK
+    );
+    Result := False;
+    Exit;
+  end;
+  // en-US recommended
+  UILang := GetUILanguage;
+  if UILang <> 1033 then
+  begin
+    MsgBox(
+      'Using en-US (English - United States) system language is recommended for better experience',
+      mbError,
+      MB_OK
+    );    
+  end;
+  MsgBox(
+    'DirectStart offers the best experience on Windows 8.1'#13#10#13#10 +
+    'Please consider using it.',
+    mbInformation,
+      MB_OK
+    );   
+        Result := True;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssDone then
+  begin    
+    MsgBox(
+      'Please restart your PC and DirectStart will be run automatically.',
+      mbInformation,
+      MB_OK
+    );
+  end;
+end;
+
 [Files]
-Source: "..\DirectStart\bin\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\MenuShortcuts\*"; DestDir: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu"; Flags: ignoreversion recursesubdirs createallsubdirs
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "C:\Users\komp\Documents\GitHub\DirectStart\DirectStart\bin\Debug\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\komp\Documents\GitHub\DirectStart\Installer\MenuShortcuts\*"; DestDir: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{commondesktop}\Launch DirectStart"; Filename: "{autopf}\{#MyAppName}\DirectStart.exe"; 
+Name: "{userappdata}\Microsoft\Windows\Start Menu\Programs\Startup\StartMenuLauncher"; Filename: "{autopf}\{#MyAppName}\StartMenu.exe"; 
 

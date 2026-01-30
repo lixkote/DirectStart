@@ -8,11 +8,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("StartMenu")]
-[assembly: AssemblyDescription("Start menu replacement for Windows 8.1")]
+[assembly: AssemblyDescription("DirectStart menu replacement for Windows 8.1")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright lixkote © 2026")]
+[assembly: AssemblyCopyright("Copyright Lixkote © 2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

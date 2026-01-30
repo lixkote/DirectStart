@@ -5,22 +5,23 @@
 
 # DirectStart
 
-## Making the scrapped start menu update real! 
+## Making the scrapped 8.1 start menu update real! 
 
-Supported operating systems:
 
-- Windows 8.1 **en-US english** build 9600
+Designed for, and fully supported on:
+
+- Windows 8.1 **en-US english** build 9600 (this is the main focus of the project)
   
-Might also run on, but unsupported **(Please do not report issues if ran on these OSes)**:
+There is also a version available for :
 
-- Windows 10 and 11 **en-US english** all builds (Some features might not be available or broken)
+- Windows 10 and 11 all builds (Some features might not be available, or be added later)
   
 ## Screenshots:
 
-![DirectStart on 8.1 Screenshot](https://github.com/Lixkote/B8taMenu/blob/main/preview2.png)
+![Windows 8.1 screenshot 1](https://github.com/Lixkote/B8taMenu/blob/main/preview2.png)
 
 ## Donate
-If you find this project useful, or you like what i am doing and my work, please consider buying me a cofee to support the development through the kofi link button at the bottom of this message, so that i can continue to keep fixing bugs, and implement new features like a new configuration GUI. Much thanks for any support :)
+If you find this, or some of my other projects useful, please consider buying me a cofee to support the development through the kofi link button at the bottom of this message, so that i can continue to keep fixing bugs, and implement new features. Much much thanks for any support :D
 - [Buy me a cofee](https://ko-fi.com/lixkote)
 
 ## Credits
