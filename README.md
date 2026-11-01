@@ -1,9 +1,8 @@
 
-<p align="left">
-    <img src="https://raw.githubusercontent.com/Lixkote/DirectStart/refs/heads/main/Gallery/laptop.png">
-</p>
+# This project is discontinued, please check out RTShell as a much better alternative to this!
+https://github.com/lixkote/RTShell
 
-# DirectStart
+###DirectStart
 
 ## Making the scrapped 8.1 start menu update real! 
 
